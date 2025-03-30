@@ -8,17 +8,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_Plaster
-    second: {fileID: 2100000, guid: 55e92c29f50b19442a09d4a685807c80, type: 2}
+    second: {fileID: 2100000, guid: 0656fa29e4709124d9bd65ef52b6dc48, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_UnevenBrick
-    second: {fileID: 2100000, guid: 9e592536e877ac7458c6a69f77a14b76, type: 2}
+    second: {fileID: 2100000, guid: 2615a018e7bb4574e8ddaab287e0b4a8, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_WoodTrim
-    second: {fileID: 2100000, guid: e235ccbde62ef594b89cc4940253a392, type: 2}
+    second: {fileID: 2100000, guid: e5db89f55329377419674fe699f6870d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

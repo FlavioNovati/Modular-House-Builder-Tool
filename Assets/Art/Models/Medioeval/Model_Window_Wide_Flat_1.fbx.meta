@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_WindowGlass
-    second: {fileID: 2100000, guid: 5a336077c61caa04185b7f427de42985, type: 2}
+    second: {fileID: 2100000, guid: 0be37dfedcc5ade4d9ab4478cf4b61a2, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_WoodTrim
-    second: {fileID: 2100000, guid: 65a6ec0a34b91c64bb0adca0f67db4e5, type: 2}
+    second: {fileID: 2100000, guid: e5db89f55329377419674fe699f6870d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

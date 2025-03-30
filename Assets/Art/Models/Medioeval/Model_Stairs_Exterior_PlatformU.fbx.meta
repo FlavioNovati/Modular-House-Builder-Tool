@@ -3,7 +3,17 @@ guid: c509906568065564a9d0f189ba10fe6e
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MI_Brick
+    second: {fileID: 2100000, guid: 5797c3b8508bbfa4eb8c9d7f4703da80, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MI_RockTrim
+    second: {fileID: 2100000, guid: 381e5d75cd648574c97cb504f24aa97d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

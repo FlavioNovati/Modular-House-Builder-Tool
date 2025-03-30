@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_WoodTrim_Wear
-    second: {fileID: 2100000, guid: 8bde89e1ca4ae1f49b8e939a5da0f8f7, type: 2}
+    second: {fileID: 2100000, guid: d8acd7989dc56984681dd5d9dd53b29f, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
