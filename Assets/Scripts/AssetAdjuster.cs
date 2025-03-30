@@ -3,12 +3,11 @@ using UnityEditor;
 
 using System.Linq;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class AssetAdjuster : EditorWindow
 {
-    [MenuItem("Tools/Adjuster")]
-    public static void OpenScatterer() => GetWindow<AssetAdjuster>();
+    [MenuItem("Tools/Asset Renamer")]
+    public static void OpenWindow() => GetWindow<AssetAdjuster>();
 
     private SerializedObject _so;
 
