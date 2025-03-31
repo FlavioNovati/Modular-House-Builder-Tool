@@ -20,6 +20,8 @@ namespace Tool.ModularHouseBuilder.SubTool
         private MeshFilter _meshFilter = null;
         private MeshRenderer _meshRenderer = null;
 
+        private Vector3 _meshRotation = Vector3.zero;
+
         public static void OpenModuleCreation_Window(Type dockNextTo)
         {
             //Get Icon Asset
@@ -65,41 +67,43 @@ namespace Tool.ModularHouseBuilder.SubTool
         private void OnGUI()
         {
             //Module Settings
+            GUILayout.Space(5f);
             GUILayout.Label("Asset Type");
             using (new GUILayout.HorizontalScope())
             {
                 //Update Module Type
                 _moduleType = (ModuleType)EditorGUILayout.EnumPopup(_moduleType, GUILayout.ExpandWidth(true));
-                
                 //Module Type Texture
                 GUIContent enumContent = new GUIContent(_moduleType.ToTexture(), _moduleType.ToDescription());
                 GUILayout.Label(enumContent);
-
                 //Add space
                 GUILayout.Space(15f);
-
                 //Allow Pinging Type folder
                 if (GUILayout.Button($"Ping Folder", GUILayout.ExpandWidth(false), GUILayout.MaxWidth(80f)))
                     EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath(GetAssetFolderPath(_moduleType), typeof(object)));
             }
 
             //Name of the Module
+            GUILayout.Space(5f);
             GUILayout.Label("Module Name");
             _moduleName = GUILayout.TextField(_moduleName, GUILayout.ExpandWidth(true));
             if (!string.IsNullOrEmpty(_moduleName))
                 _moduleName = _moduleName.Replace(' ', '_');
 
             //Model of the Module
+            GUILayout.Space(5f);
             GUILayout.Label("Module 3D Model");
             if(GUILayout.Button("Select Model", GUILayout.ExpandWidth(true)))
                 EditorGUIUtility.ShowObjectPicker<GameObject>(_modelGameObject, false, "t: Model", -1);
-
-            //Update Preview
-            if(_modelGameObject != null)
+            //Draw Preview if possible
+            if (_modelGameObject != null)
                 GUILayout.Box(AssetPreview.GetAssetPreview(_modelGameObject), GUILayout.ExpandWidth(true));
+            //Mesh Rotation
+            _meshRotation = EditorGUILayout.Vector3Field("Mesh Rotation", _meshRotation, GUILayout.ExpandWidth(true));
 
-            //Create Module Button (only if module have a name)
-            if (!string.IsNullOrEmpty(_moduleName))
+            GUILayout.Space(5f);
+            //Create Module Button (only if module have a Name and a Mesh)
+            if (!string.IsNullOrEmpty(_moduleName) && _modelGameObject != null)
             {
                 if (GUILayout.Button($"Create {PREFAB_PREFIX}{_moduleType.ToAssetName()}_{_moduleName}", GUILayout.ExpandWidth(true)))
                 {
@@ -168,6 +172,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             meshHolder.transform.parent = prefab.transform;
             GameObject meshGameObject = new GameObject("Module_Mesh", typeof(MeshFilter), typeof(MeshRenderer));
             meshGameObject.transform.parent = meshHolder.transform;
+            meshGameObject.transform.eulerAngles = _meshRotation;
 
             //Set Component Parameters
             meshGameObject.GetComponent<MeshFilter>().mesh = _meshFilter.sharedMesh;
