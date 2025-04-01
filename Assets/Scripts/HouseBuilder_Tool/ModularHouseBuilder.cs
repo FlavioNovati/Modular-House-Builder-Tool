@@ -7,11 +7,13 @@ namespace Tool.ModularHouseBuilder
 {
     public class ModularHouseBuilder : EditorWindow
     {
+        const string TOOL_FOLDER_PATH = "Assets/Scripts/HouseBuilder_Tool/";
+
         [MenuItem("Tools/House Builder")]
         public static void OpenHouseBuilder()
         {
             //Get Icon Asset
-            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath("Assets/Scripts/HouseBuilder_Tool/HouseBuilder_Art/MainIcon.png", typeof(Texture));
+            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_FOLDER_PATH}HouseBuilder_Art/MainIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Modular House Builder", windowIcon, "Tool to create modular structures");
 
             //Create Window
@@ -21,9 +23,20 @@ namespace Tool.ModularHouseBuilder
             window.name = "House Builder";
         }
 
+        private GUILayoutOption[] _openAssetsButtonOptions;
+        private GUIContent _openAssetsButtonContent;
+
         private void OnEnable()
         {
             //this.BeginWindows();
+
+            _openAssetsButtonOptions = new GUILayoutOption[]
+            {
+                GUILayout.ExpandWidth(true),
+            };
+
+            Texture icon = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_FOLDER_PATH}HouseBuilder_Art/OpenIcon.png", typeof(Texture));
+            _openAssetsButtonContent = new GUIContent("Display Assets", icon);
         }
 
         private void OnDisable()
@@ -40,6 +53,9 @@ namespace Tool.ModularHouseBuilder
             {
                 
             }
+
+            if (GUILayout.Button(_openAssetsButtonContent, _openAssetsButtonOptions))
+                ModulesExplorer_Window.OpenExplorer_Window(TOOL_FOLDER_PATH, typeof(ModularHouseBuilder));
         }
     }
 }

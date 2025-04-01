@@ -18,6 +18,15 @@ namespace Tool.ModularHouseBuilder
 
     public static class ModuleTypeUtils
     {
+        public static ModuleType ModuleTypeFromInt(int index)
+        {
+            int value = 0;
+            if(index != 0)
+                value = (int)Mathf.Pow(2, index);
+
+            return (ModuleType)value;
+        }
+
         public static string ToFolderName(this ModuleType module)
         {
             switch(module)

@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Tool.ModularHouseBuilder.SubTool
 {
@@ -44,11 +43,10 @@ namespace Tool.ModularHouseBuilder.SubTool
             //Create Module Type Folders
             int enumEntries = Enum.GetValues(typeof(ModuleType)).Length;
             string parentPath = $"{PREFAB_FOLDER_PATH}/{PREFAB_FOLDER_NAME}";
-
-            CreateModuleFolder(parentPath, ((ModuleType)0).ToFolderName());
-            for (int i = 1; i < enumEntries; i++)
+            
+            for (int i = 0; i < enumEntries; i++)
             {
-                ModuleType entry = (ModuleType)Math.Pow(2, i);
+                ModuleType entry = ModuleTypeUtils.ModuleTypeFromInt(i);
                 CreateModuleFolder(parentPath, entry.ToFolderName());
             }
         }
