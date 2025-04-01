@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Tool.ModularHouseBuilder.SubTool
 {
@@ -43,12 +44,11 @@ namespace Tool.ModularHouseBuilder.SubTool
             //Create Module Type Folders
             int enumEntries = Enum.GetValues(typeof(ModuleType)).Length;
             string parentPath = $"{PREFAB_FOLDER_PATH}/{PREFAB_FOLDER_NAME}";
-            //Add First entry Folder
-            CreateModuleFolder(parentPath, ((ModuleType) 0).ToFolderName());
-            //Add All the other folders
-            for (int i = 2; i < Mathf.Pow(2, enumEntries); i*=2)
+
+            CreateModuleFolder(parentPath, ((ModuleType)0).ToFolderName());
+            for (int i = 1; i < enumEntries; i++)
             {
-                ModuleType entry = (ModuleType)i;
+                ModuleType entry = (ModuleType)Math.Pow(2, i);
                 CreateModuleFolder(parentPath, entry.ToFolderName());
             }
         }
@@ -166,18 +166,23 @@ namespace Tool.ModularHouseBuilder.SubTool
             string modulePath = $"{folderPath}/{PREFAB_PREFIX}{name}.prefab";
             modulePath = AssetDatabase.GenerateUniqueAssetPath(modulePath);
             
-            //Create Prefab
-            GameObject prefab = new GameObject(name);
+            //Parent
+            // -MESH- (Mesh Holder)
+            //  Mesh (Actual Mesh)
+
+            //Create Parent
+            GameObject prefab = new GameObject(name, typeof(HouseBuilderModule));
+            //Create Mesh Holder Child
             GameObject meshHolder = new GameObject("-MESH-");
             meshHolder.transform.parent = prefab.transform;
+            //Create Mesh Object
             GameObject meshGameObject = new GameObject("Module_Mesh", typeof(MeshFilter), typeof(MeshRenderer));
             meshGameObject.transform.parent = meshHolder.transform;
             meshGameObject.transform.eulerAngles = _meshRotation;
-
-            //Set Component Parameters
             meshGameObject.GetComponent<MeshFilter>().mesh = _meshFilter.sharedMesh;
             meshGameObject.GetComponent<MeshRenderer>().materials = _meshRenderer.sharedMaterials;
 
+            //Save Prefab
             PrefabUtility.SaveAsPrefabAsset(prefab, modulePath);
 
             //Create Scriptable
@@ -195,7 +200,9 @@ namespace Tool.ModularHouseBuilder.SubTool
             //Instanciate Scriptable
             ModuleData module_Data = ScriptableObject.CreateInstance<ModuleData>();
             module_Data.Prefab = (GameObject)AssetDatabase.LoadAssetAtPath(prefabAssetPath, typeof(GameObject));
-            
+            //Link Data
+            module_Data.Prefab.GetComponent<HouseBuilderModule>().ModuleData = module_Data;
+
             //Get Path
             string moduleDataPath = $"{saveFolderPath}/{SCRIPTABLE_PREFIX}{name}.asset";
             moduleDataPath = AssetDatabase.GenerateUniqueAssetPath(moduleDataPath);
@@ -203,8 +210,12 @@ namespace Tool.ModularHouseBuilder.SubTool
             //Create Scriptable Asset
             module_Data.SetPreview(null);
             module_Data.ModuleType = _moduleType;
+
             //Create Asset
             AssetDatabase.CreateAsset(module_Data, moduleDataPath);
+
+            //Update Prefab
+            PrefabUtility.SavePrefabAsset(module_Data.Prefab);
         }
 
         private string GetAssetFolderPath(ModuleType moduleType) => $"{PREFAB_FOLDER_PATH}/{PREFAB_FOLDER_NAME}/{moduleType.ToFolderName()}";
