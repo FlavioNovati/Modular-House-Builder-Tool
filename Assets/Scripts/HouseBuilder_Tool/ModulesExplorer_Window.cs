@@ -110,19 +110,22 @@ namespace Tool.ModularHouseBuilder.SubTool
             
             //SEARCH BAR
             //Draw Seach bar icon
-            Rect iconRect = new Rect(windowRect.xMin + 20, windowRect.y, 16, 16);
-            GUI.Label(iconRect, _searchGUIContent);
-            _searchInput = GUILayout.TextField(_searchInput, _searchGUIOptions);
+            using(new GUILayout.HorizontalScope())
+            {
+                GUILayout.Label(_searchGUIContent);
+                _searchInput = GUILayout.TextField(_searchInput, _searchGUIOptions);
+            }
 
             //Show assets
+            //TODO: CONTINUE
 
 
 
 
-
-            //Input Handling
+            //INPUT HANDLING
             Event currentEvent = Event.current;
             EventType currentEventType = Event.current.type;
+
             //Lose Focus
             if (currentEventType == EventType.MouseDown && currentEvent.button == 0)
             {
