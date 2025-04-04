@@ -10,6 +10,8 @@ namespace Tool.ModularHouseBuilder
         private HouseBuilderModule _module;
         private MeshFilter _meshFilter;
 
+        private bool _useBoundsForCollisions = true;
+
         void OnEnable()
         {
             _module = (HouseBuilderModule)target;
@@ -30,6 +32,7 @@ namespace Tool.ModularHouseBuilder
 
         public override void OnInspectorGUI()
         {
+            _useBoundsForCollisions = GUILayout.Toggle(_useBoundsForCollisions, "Use Bounds for Collision", GUILayout.ExpandWidth(true));
             if (GUILayout.Button("Update Collider", GUILayout.ExpandWidth(true)))
                 UpdateCollider();
         }
@@ -61,23 +64,7 @@ namespace Tool.ModularHouseBuilder
         
         private void DrawInPrefabMode(SceneView view)
         {
-            //Draw Orign
-            Handles.SphereHandleCap(-1, Vector3.zero, Quaternion.identity, 0.2f, EventType.Repaint);
-            
-            //Draw Object Extentions
-            Quaternion objectRotation = _module.GetComponentInChildren<MeshFilter>().gameObject.transform.rotation;
-            Vector3 objectScale = _module.GetComponentInChildren<MeshFilter>().gameObject.transform.lossyScale;
-            Matrix4x4 handlesMatrix = Matrix4x4.Rotate(objectRotation);
 
-            Vector3 objectExtends = _module.GetComponentInChildren<MeshFilter>().sharedMesh.bounds.extents * 2;
-
-            Vector3 finalSize = objectExtends;
-            finalSize.x *= objectScale.x;
-            finalSize.y *= objectScale.y;
-            finalSize.z *= objectScale.z;
-
-            Handles.matrix = handlesMatrix;
-            Handles.DrawWireCube(Vector3.zero, finalSize);
         }
 
         private void DrawInGameSceneMode(SceneView view)
@@ -102,6 +89,5 @@ namespace Tool.ModularHouseBuilder
             BoxCollider boxCollider = _module.gameObject.GetComponent<BoxCollider>();
             boxCollider.size = colliderSize;
         }
-
     }
 }

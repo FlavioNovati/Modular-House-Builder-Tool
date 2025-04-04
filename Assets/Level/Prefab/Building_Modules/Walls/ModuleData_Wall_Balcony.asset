@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7da09350c191f84889edcbf07a15c2d, type: 3}
   m_Name: ModuleData_Wall_Balcony
   m_EditorClassIdentifier: 
-  _prefab: {fileID: 6330907121685274199, guid: 11667201967025f4a9212700ae661323, type: 3}
-  _extentions: {x: 1, y: 1, z: 1}
-  _pivotPosition: {x: 0, y: 0, z: 0}
+  _prefab: {fileID: 6763511481648861136, guid: 11667201967025f4a9212700ae661323, type: 3}
+  Extension: {x: 2.0000007, y: 1.2298865, z: -0.20628302}
+  CenterOffset: {x: 0, y: 0.61494327, z: 0}
   _moduleType: 0
   _modulePreview: {fileID: 2800000, guid: 99ac78eafd3397c4885e116132b29e46, type: 3}

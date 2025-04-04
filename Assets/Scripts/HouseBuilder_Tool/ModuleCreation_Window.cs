@@ -22,6 +22,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private Vector3 _meshRotation = Vector3.zero;
         private Vector3 _meshScale = Vector3.one;
+        private bool _offsetByHalfHeight = false;
 
         public static void OpenModuleCreation_Window(Type dockNextTo)
         {
@@ -100,6 +101,8 @@ namespace Tool.ModularHouseBuilder.SubTool
             //Mesh Rotation
             _meshRotation = EditorGUILayout.Vector3Field("Mesh Rotation", _meshRotation, GUILayout.ExpandWidth(true));
             _meshScale = EditorGUILayout.Vector3Field("Mesh Scale", _meshScale, GUILayout.ExpandWidth(true));
+            _offsetByHalfHeight = GUILayout.Toggle(_offsetByHalfHeight, "Offset by half height", GUILayout.ExpandWidth(true));
+
 
             GUILayout.Space(5f);
             //Create Module Button (only if module have a Name and a Mesh)
@@ -203,14 +206,24 @@ namespace Tool.ModularHouseBuilder.SubTool
             colliderSize.y *= _meshScale.y;
             colliderSize = Quaternion.Euler(_meshRotation) * colliderSize;
 
+            //Move mesh by offset
+            Vector3 offset = Vector3.zero;
+            if (_offsetByHalfHeight)
+                offset.y += colliderSize.y / 2f;
+
+            meshGameObject.transform.position += offset;
+
+            //Set box collider
             BoxCollider boxCollider = prefab.GetComponent<BoxCollider>();
             boxCollider.size = colliderSize;
+            boxCollider.center = offset;
+
 
             //Save Prefab
             PrefabUtility.SaveAsPrefabAsset(prefab, modulePath);
 
             //Create Scriptable
-            CreateAndLinkData(name, folderPath, modulePath);
+            CreateAndLinkData(name, folderPath, modulePath, colliderSize, offset);
 
             //Destroy instanciated game object in scene
             DestroyImmediate(prefab);
@@ -219,7 +232,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             _modulePath = modulePath;
         }
 
-        private void CreateAndLinkData(string name, string saveFolderPath, string prefabAssetPath)
+        private void CreateAndLinkData(string name, string saveFolderPath, string prefabAssetPath, Vector3 extension, Vector3 centerOffset)
         {
             //Instanciate Scriptable
             ModuleData module_Data = ScriptableObject.CreateInstance<ModuleData>();
@@ -234,10 +247,11 @@ namespace Tool.ModularHouseBuilder.SubTool
             //Create Scriptable Asset
             module_Data.SetPreview(null);
             module_Data.ModuleType = _moduleType;
+            module_Data.Extension = extension;
+            module_Data.CenterOffset = centerOffset;
 
             //Create Asset
             AssetDatabase.CreateAsset(module_Data, moduleDataPath);
-
             //Update Prefab
             PrefabUtility.SavePrefabAsset(module_Data.Prefab);
         }
