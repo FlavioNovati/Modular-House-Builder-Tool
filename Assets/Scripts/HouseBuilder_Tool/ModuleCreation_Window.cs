@@ -21,6 +21,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         private MeshRenderer _meshRenderer = null;
 
         private Vector3 _meshRotation = Vector3.zero;
+        private Vector3 _meshScale = Vector3.one;
 
         public static void OpenModuleCreation_Window(Type dockNextTo)
         {
@@ -98,6 +99,7 @@ namespace Tool.ModularHouseBuilder.SubTool
                 GUILayout.Box(AssetPreview.GetAssetPreview(_modelGameObject), GUILayout.ExpandWidth(true));
             //Mesh Rotation
             _meshRotation = EditorGUILayout.Vector3Field("Mesh Rotation", _meshRotation, GUILayout.ExpandWidth(true));
+            _meshScale = EditorGUILayout.Vector3Field("Mesh Scale", _meshScale, GUILayout.ExpandWidth(true));
 
             GUILayout.Space(5f);
             //Create Module Button (only if module have a Name and a Mesh)
@@ -109,6 +111,7 @@ namespace Tool.ModularHouseBuilder.SubTool
                     string moduleName = $"{_moduleType.ToAssetName()}_{_moduleName}";
                     string moduleFolderPath = GetAssetFolderPath(_moduleType);
                     CreateModule(moduleName, moduleFolderPath);
+
 
                     //Lose Focus
                     GUI.FocusControl(null);
@@ -169,16 +172,39 @@ namespace Tool.ModularHouseBuilder.SubTool
             //  Mesh (Actual Mesh)
 
             //Create Parent
-            GameObject prefab = new GameObject(name, typeof(HouseBuilderModule));
+            GameObject prefab = new GameObject(name, typeof(HouseBuilderModule), typeof(BoxCollider));
+
             //Create Mesh Holder Child
             GameObject meshHolder = new GameObject("-MESH-");
             meshHolder.transform.parent = prefab.transform;
-            //Create Mesh Object
+            
+            //Create Mesh Game Object
             GameObject meshGameObject = new GameObject("Module_Mesh", typeof(MeshFilter), typeof(MeshRenderer));
             meshGameObject.transform.parent = meshHolder.transform;
             meshGameObject.transform.eulerAngles = _meshRotation;
+            meshGameObject.transform.localScale = _meshScale;
             meshGameObject.GetComponent<MeshFilter>().mesh = _meshFilter.sharedMesh;
             meshGameObject.GetComponent<MeshRenderer>().materials = _meshRenderer.sharedMaterials;
+            
+            //Move Mesh Game Object acccording to rotation, scale and bounds
+            Vector3 meshOffset = _meshFilter.sharedMesh.bounds.center;
+            meshOffset.x *= _meshScale.x;
+            meshOffset.y *= _meshScale.y;
+            meshOffset.z *= _meshScale.z;
+            //Rotate Offset
+            meshOffset = Quaternion.Euler(_meshRotation) * meshOffset;
+            //Apply Offset
+            meshGameObject.transform.position -= meshOffset;
+            
+            //Get Collider Size
+            Vector3 colliderSize = _meshFilter.sharedMesh.bounds.extents * 2f;
+            colliderSize.x *= _meshScale.x;
+            colliderSize.z *= _meshScale.z;
+            colliderSize.y *= _meshScale.y;
+            colliderSize = Quaternion.Euler(_meshRotation) * colliderSize;
+
+            BoxCollider boxCollider = prefab.GetComponent<BoxCollider>();
+            boxCollider.size = colliderSize;
 
             //Save Prefab
             PrefabUtility.SaveAsPrefabAsset(prefab, modulePath);

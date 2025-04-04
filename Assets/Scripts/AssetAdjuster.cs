@@ -22,6 +22,8 @@ public class AssetAdjuster : EditorWindow
     private bool _rename;
     private bool _assignMaterial;
 
+    private GameObject _selectedModel;
+
     private void OnEnable()
     {
         _so = new SerializedObject(this);
@@ -43,7 +45,7 @@ public class AssetAdjuster : EditorWindow
         _filter = GUILayout.TextField(_filter, GUILayout.ExpandWidth(true));
 
         _rename = GUILayout.Toggle(_rename, "Fix Asset Name", GUILayout.ExpandWidth(true));
-        if(_rename)
+        if (_rename)
         {
             GUILayout.Label("Before Name");
             _initial = GUILayout.TextField(_initial, GUILayout.ExpandWidth(true));
@@ -69,18 +71,47 @@ public class AssetAdjuster : EditorWindow
             for (int i = 0; i < pathsArray.Length; i++)
                 objects[i] = AssetDatabase.LoadAssetAtPath(pathsArray[i], typeof(object));
 
-            if(_rename)
-                for(int i=0; i < objects.Length; i++)
+            if (_rename)
+                for (int i = 0; i < objects.Length; i++)
                     RenameAsset(objects[i], pathsArray[i]);
-            
+
             if (MaterialToApply != null && _assignMaterial)
-                foreach(Object obj in objects)
+                foreach (Object obj in objects)
                     ApplyMaterial(obj, MaterialToApply);
         }
 
-        if(_so.ApplyModifiedProperties())
+        //Model of the Module
+        GUILayout.Space(5f);
+        GUILayout.Label("Module 3D Model");
+        if (GUILayout.Button("Select Model", GUILayout.ExpandWidth(true)))
+            EditorGUIUtility.ShowObjectPicker<GameObject>(_selectedModel, false, "t: Model", -1);
+
+        if (GUILayout.Button("Fix Model", GUILayout.ExpandWidth(true)))
         {
 
+        }
+
+        if (_so.ApplyModifiedProperties())
+        {
+
+        }
+
+        //Event Handling
+        Event currentEvent = Event.current;
+        EventType currentEventType = currentEvent.type;
+
+        //Object picked
+        if (currentEventType == EventType.ExecuteCommand)
+        {
+            if (currentEvent.commandName == "ObjectSelectorUpdated")
+            {
+                _selectedModel = (GameObject)EditorGUIUtility.GetObjectPickerObject();
+                if (_selectedModel != null)
+                {
+                    string path = AssetDatabase.GetAssetPath(_selectedModel);
+                    ReimportAsset(path);
+                }
+            }
         }
     }
 
@@ -150,5 +181,17 @@ public class AssetAdjuster : EditorWindow
             if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
                 renderer.sharedMaterial = material;
         }
+    }
+
+
+    private void ReimportAsset(string assetPath)
+    {
+        ImportAssetOptions options = new ImportAssetOptions();
+        options = ImportAssetOptions.ForceUpdate;
+
+        AssetImporter assetImporter = AssetImporter.GetAtPath(assetPath);
+        
+
+        AssetDatabase.ImportAsset(assetPath, options);
     }
 }

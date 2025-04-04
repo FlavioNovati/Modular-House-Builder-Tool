@@ -1,7 +1,6 @@
-using System;
+using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityEngine;
 
 namespace Tool.ModularHouseBuilder
 {
@@ -10,19 +9,10 @@ namespace Tool.ModularHouseBuilder
     {
         private ModuleData _moduleData;
 
-        const float TEXTURE_MAX_SIZE = 150f;
-
         void OnEnable()
         {
             _moduleData = (ModuleData)target;
             _moduleData.SetPreview(AssetPreview.GetAssetPreview(_moduleData.Prefab));
-
-            SceneView.duringSceneGui += DuringSceneGUI;
-        }
-
-        private void OnDisable()
-        {
-            SceneView.duringSceneGui -= DuringSceneGUI;
         }
 
         public override void OnInspectorGUI()
@@ -51,16 +41,6 @@ namespace Tool.ModularHouseBuilder
                 string prefabPath = AssetDatabase.GetAssetPath(_moduleData.Prefab);
                 PrefabStageUtility.OpenPrefab(prefabPath);
             }
-        }
-
-        private void DuringSceneGUI(SceneView view)
-        {
-            //Draw Gizsmo
-            //Draw Collision Shape
-            //Add Collision?
-            //Draw Collision that will be removed
-            
-            //Confirm
         }
     }
 }
