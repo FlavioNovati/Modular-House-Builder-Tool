@@ -6,18 +6,13 @@ namespace Tool.ModularHouseBuilder
     [CreateAssetMenu(fileName = "New Module", menuName = "scriptable/Tools/ModularHouseBuilder/Module")]
     public class ModuleData : ScriptableObject
     {
-        [SerializeField] public GameObject _prefab;
+        [SerializeField] public GameObject Prefab;
         [SerializeField] public Vector3 Extension;
+        [SerializeField] public Vector3 Rotation;
         [SerializeField] public Vector3 CenterOffset;
 
         [SerializeField] private ModuleType _moduleType;
         [SerializeField] private Texture _modulePreview;
-
-        public GameObject Prefab
-        {
-            get => _prefab;
-            set => _prefab = value;
-        }
 
         public ModuleType ModuleType
         {
@@ -33,7 +28,7 @@ namespace Tool.ModularHouseBuilder
 
         public ModuleData()
         {
-            _prefab = null;
+            Prefab = null;
             Extension = Vector3.one;
             CenterOffset = Vector3.zero;
             _modulePreview = null;
@@ -41,7 +36,7 @@ namespace Tool.ModularHouseBuilder
 
         public ModuleData(GameObject prefab)
         {
-            _prefab = prefab;
+            Prefab = prefab;
             Extension = Vector3.one;
             CenterOffset = Vector3.zero;
             _modulePreview = PrefabUtility.GetIconForGameObject(prefab);

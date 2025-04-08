@@ -206,6 +206,10 @@ namespace Tool.ModularHouseBuilder.SubTool
             colliderSize.y *= _meshScale.y;
             colliderSize = Quaternion.Euler(_meshRotation) * colliderSize;
 
+            colliderSize.x = Mathf.Abs(colliderSize.x);
+            colliderSize.y = Mathf.Abs(colliderSize.y);
+            colliderSize.z = Mathf.Abs(colliderSize.z);
+
             //Move mesh by offset
             Vector3 offset = Vector3.zero;
             if (_offsetByHalfHeight)
@@ -249,6 +253,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             module_Data.ModuleType = _moduleType;
             module_Data.Extension = extension;
             module_Data.CenterOffset = centerOffset;
+            module_Data.Rotation = _meshRotation;
 
             //Create Asset
             AssetDatabase.CreateAsset(module_Data, moduleDataPath);
