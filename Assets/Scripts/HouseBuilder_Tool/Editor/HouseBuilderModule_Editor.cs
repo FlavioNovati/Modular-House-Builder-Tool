@@ -15,7 +15,7 @@ namespace Tool.ModularHouseBuilder
 
         private bool _useBoundsForCollisions = true;
         private int _nearestHandle;
-        private Vector2 previousMousePos;
+        private Vector2 _previousMousePos;
 
         void OnEnable()
         {
@@ -60,6 +60,8 @@ namespace Tool.ModularHouseBuilder
             {
                 hoverIndex = HandleUtility.nearestControl;
 
+                //Debug.Log(hoverIndex);
+
                 Handles.color = hoverIndex == 11 ? Color.magenta : Color.green;
                 DrawHandleCap(11, yHandlePos + yHandleOffset, Vector3.up, HANDLE_SIZE, EventType.Repaint);
                 Handles.DotHandleCap(-1, yHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
@@ -83,7 +85,7 @@ namespace Tool.ModularHouseBuilder
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
                 _nearestHandle = HandleUtility.nearestControl;
-                previousMousePos = Event.current.mousePosition;
+                _previousMousePos = Event.current.mousePosition;
 
                 Undo.RegisterCompleteObjectUndo(_module.ModuleData, "Module Modified");
                 Undo.FlushUndoRecordObjects();
@@ -93,7 +95,7 @@ namespace Tool.ModularHouseBuilder
             {
                 if(_nearestHandle == 11)//Y Handle
                 {
-                    float move = HandleUtility.CalcLineTranslation(previousMousePos, Event.current.mousePosition, yHandlePos + yHandleOffset, Vector3.up);
+                    float move = HandleUtility.CalcLineTranslation(_previousMousePos, Event.current.mousePosition, yHandlePos + yHandleOffset, Vector3.up);
                     _module.ModuleData.Extension.y += move;
                     _module.ModuleData.Extension.y = Mathf.Clamp(_module.ModuleData.Extension.y, 0, float.MaxValue);
 
@@ -101,7 +103,7 @@ namespace Tool.ModularHouseBuilder
                 }
                 if(_nearestHandle == 12)//X Handle
                 {
-                    float move = HandleUtility.CalcLineTranslation(previousMousePos, Event.current.mousePosition, xHandlePos + xHandleOffset, Vector3.right);
+                    float move = HandleUtility.CalcLineTranslation(_previousMousePos, Event.current.mousePosition, xHandlePos + xHandleOffset, Vector3.right);
                     _module.ModuleData.Extension.x += move;
                     _module.ModuleData.Extension.x = Mathf.Clamp(_module.ModuleData.Extension.x, 0, float.MaxValue);
 
@@ -109,21 +111,21 @@ namespace Tool.ModularHouseBuilder
                 }
                 if(_nearestHandle == 13)//Z Handle
                 {
-                    float move = HandleUtility.CalcLineTranslation(previousMousePos, Event.current.mousePosition, zHandlePos + zHandleOffset, Vector3.forward);
+                    float move = HandleUtility.CalcLineTranslation(_previousMousePos, Event.current.mousePosition, zHandlePos + zHandleOffset, Vector3.forward);
                     _module.ModuleData.Extension.z += move;
                     _module.ModuleData.Extension.z = Mathf.Clamp(_module.ModuleData.Extension.z, 0, float.MaxValue);
 
                     EditorUtility.SetDirty(_module.ModuleData);
                 }
 
-                previousMousePos = Event.current.mousePosition;
+                _previousMousePos = Event.current.mousePosition;
                 SceneView.RepaintAll();
             }
 
             if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
             {
                 _nearestHandle = -1;
-                previousMousePos = Vector2.zero;
+                _previousMousePos = Vector2.zero;
             }
         }
 
