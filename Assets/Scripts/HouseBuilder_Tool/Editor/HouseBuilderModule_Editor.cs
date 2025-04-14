@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using System.Security.Policy;
 
 namespace Tool.ModularHouseBuilder
 {
@@ -9,6 +10,10 @@ namespace Tool.ModularHouseBuilder
     {
         const float HANDLE_SIZE = 0.25f;
         const float HANDLE_DISTANCE = 0.15f;
+
+        private Color _xAxisColor = Color.red;
+        private Color _yAxisColor = Color.green;
+        private Color _zAxisColor = Color.blue;
 
         private HouseBuilderModule _module;
         private MeshFilter _meshFilter;
@@ -62,15 +67,21 @@ namespace Tool.ModularHouseBuilder
 
                 //Debug.Log(hoverIndex);
 
-                Handles.color = hoverIndex == 11 ? Color.magenta : Color.green;
+                Handles.color = hoverIndex == 11 ? Color.magenta : _yAxisColor;
+                if(hoverIndex == 11)
+                    DrawExtentionLimit(ExtentionLimit.UP);
                 DrawHandleCap(11, yHandlePos + yHandleOffset, Vector3.up, HANDLE_SIZE, EventType.Repaint);
                 Handles.DotHandleCap(-1, yHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
 
-                Handles.color = hoverIndex == 12 ? Color.magenta : Color.red;
+                Handles.color = hoverIndex == 12 ? Color.magenta : _xAxisColor;
+                if (hoverIndex == 12)
+                    DrawExtentionLimit(ExtentionLimit.RIGHT);
                 DrawHandleCap(12, xHandlePos + xHandleOffset, Vector3.right, HANDLE_SIZE, EventType.Repaint);
                 Handles.DotHandleCap(-1, xHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
 
-                Handles.color = hoverIndex == 13 ? Color.magenta : Color.blue;
+                Handles.color = hoverIndex == 13 ? Color.magenta : _zAxisColor;
+                if (hoverIndex == 13)
+                    DrawExtentionLimit(ExtentionLimit.FORWARD);
                 DrawHandleCap(13, zHandlePos + zHandleOffset, Vector3.forward, HANDLE_SIZE, EventType.Repaint);
                 Handles.DotHandleCap(-1, zHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
             }
@@ -131,6 +142,58 @@ namespace Tool.ModularHouseBuilder
 
         private void DrawHandleCap(int controlID, Vector3 startPos, Vector3 direction, float size, EventType eventType)
             => Handles.ArrowHandleCap(controlID, startPos, Quaternion.LookRotation(direction), size, eventType);
+
+        private enum ExtentionLimit
+        {
+            UP,
+            FORWARD,
+            RIGHT
+        }
+
+        private void DrawExtentionLimit(ExtentionLimit limitType)
+        {
+            Vector3[] bounds = new Vector3[4];
+
+            Color fadeColor = Color.white;
+            Color lineColor = Color.white;
+
+            float x = _module.ModuleData.Extension.x / 2f + _module.ModuleData.CenterOffset.x;
+            float y = _module.ModuleData.Extension.y / 2f + _module.ModuleData.CenterOffset.y;
+            float z = _module.ModuleData.Extension.z / 2f + _module.ModuleData.CenterOffset.z;
+
+            switch (limitType)
+            {
+                case ExtentionLimit.UP:
+                    Handles.color = _yAxisColor;
+
+                    bounds[0] = new Vector3(x, y, z);
+                    bounds[1] = new Vector3(-x, y, -z);
+                    bounds[2] = new Vector3(-x, y, z);
+                    bounds[3] = new Vector3(x, y, -z);
+
+                    lineColor = _yAxisColor;
+                    fadeColor = _yAxisColor;
+                    break;
+
+                case ExtentionLimit.FORWARD:
+
+
+                    lineColor = _zAxisColor;
+                    fadeColor = _zAxisColor;
+
+                    break;
+
+                case ExtentionLimit.RIGHT:
+                    
+                    lineColor = _xAxisColor;
+                    fadeColor = _xAxisColor;
+                    break;
+            }
+
+            fadeColor.a = 0.25f;
+
+            Handles.DrawSolidRectangleWithOutline(bounds, fadeColor, lineColor);
+        }
 
         public override void OnInspectorGUI()
         {
