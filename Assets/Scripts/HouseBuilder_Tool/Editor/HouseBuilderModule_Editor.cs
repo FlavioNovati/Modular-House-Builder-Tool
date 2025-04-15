@@ -22,6 +22,8 @@ namespace Tool.ModularHouseBuilder
         private int _nearestHandle;
         private Vector2 _previousMousePos;
 
+        private ExtensionMoved _movedExtension;
+
         void OnEnable()
         {
             _module = (HouseBuilderModule)target;
@@ -59,33 +61,28 @@ namespace Tool.ModularHouseBuilder
             Vector3 zHandlePos = new Vector3(offset.x, yExtension/2f, zExtension);
             Vector3 zHandleOffset = new Vector3(0f, 0f, HANDLE_DISTANCE);
 
-
+            //Draw Handles Caps
             int hoverIndex = -1;
             if (Event.current.type == EventType.Repaint)
             {
                 hoverIndex = HandleUtility.nearestControl;
 
-                //Debug.Log(hoverIndex);
-
-                Handles.color = hoverIndex == 11 ? Color.magenta : _yAxisColor;
-                if(hoverIndex == 11)
-                    DrawExtentionLimit(ExtentionLimit.UP);
+                Handles.color = _yAxisColor;
                 DrawHandleCap(11, yHandlePos + yHandleOffset, Vector3.up, HANDLE_SIZE, EventType.Repaint);
                 Handles.DotHandleCap(-1, yHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
 
-                Handles.color = hoverIndex == 12 ? Color.magenta : _xAxisColor;
-                if (hoverIndex == 12)
-                    DrawExtentionLimit(ExtentionLimit.RIGHT);
+                Handles.color = _xAxisColor;
                 DrawHandleCap(12, xHandlePos + xHandleOffset, Vector3.right, HANDLE_SIZE, EventType.Repaint);
                 Handles.DotHandleCap(-1, xHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
 
-                Handles.color = hoverIndex == 13 ? Color.magenta : _zAxisColor;
-                if (hoverIndex == 13)
-                    DrawExtentionLimit(ExtentionLimit.FORWARD);
+                Handles.color = _zAxisColor;
                 DrawHandleCap(13, zHandlePos + zHandleOffset, Vector3.forward, HANDLE_SIZE, EventType.Repaint);
                 Handles.DotHandleCap(-1, zHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
+
+                DrawExtensionLimit(_movedExtension);
             }
 
+            //Draw Handle Cap with Layout Event
             if (Event.current.type == EventType.Layout)
             {
                 DrawHandleCap(11, yHandlePos + yHandleOffset, Vector3.up, HANDLE_SIZE, EventType.Layout);
@@ -93,6 +90,7 @@ namespace Tool.ModularHouseBuilder
                 DrawHandleCap(13, zHandlePos + zHandleOffset, Vector3.forward, HANDLE_SIZE, EventType.Layout);
             }
             
+            //Mouse Down
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
                 _nearestHandle = HandleUtility.nearestControl;
@@ -102,14 +100,18 @@ namespace Tool.ModularHouseBuilder
                 Undo.FlushUndoRecordObjects();
             }
 
+            //Mouse Drag -> expand selected extension
             if (Event.current.type == EventType.MouseDrag)
             {
+                ExtensionMoved movedExtention = ExtensionMoved.NONE;
+
                 if(_nearestHandle == 11)//Y Handle
                 {
                     float move = HandleUtility.CalcLineTranslation(_previousMousePos, Event.current.mousePosition, yHandlePos + yHandleOffset, Vector3.up);
                     _module.ModuleData.Extension.y += move;
                     _module.ModuleData.Extension.y = Mathf.Clamp(_module.ModuleData.Extension.y, 0, float.MaxValue);
 
+                    movedExtention = ExtensionMoved.UP;
                     EditorUtility.SetDirty(_module.ModuleData);
                 }
                 if(_nearestHandle == 12)//X Handle
@@ -118,6 +120,7 @@ namespace Tool.ModularHouseBuilder
                     _module.ModuleData.Extension.x += move;
                     _module.ModuleData.Extension.x = Mathf.Clamp(_module.ModuleData.Extension.x, 0, float.MaxValue);
 
+                    movedExtention = ExtensionMoved.RIGHT;
                     EditorUtility.SetDirty(_module.ModuleData);
                 }
                 if(_nearestHandle == 13)//Z Handle
@@ -126,9 +129,11 @@ namespace Tool.ModularHouseBuilder
                     _module.ModuleData.Extension.z += move;
                     _module.ModuleData.Extension.z = Mathf.Clamp(_module.ModuleData.Extension.z, 0, float.MaxValue);
 
+                    movedExtention = ExtensionMoved.FORWARD;
                     EditorUtility.SetDirty(_module.ModuleData);
                 }
 
+                _movedExtension = movedExtention;
                 _previousMousePos = Event.current.mousePosition;
                 SceneView.RepaintAll();
             }
@@ -137,60 +142,81 @@ namespace Tool.ModularHouseBuilder
             {
                 _nearestHandle = -1;
                 _previousMousePos = Vector2.zero;
+
+                _movedExtension = ExtensionMoved.NONE;
             }
         }
 
         private void DrawHandleCap(int controlID, Vector3 startPos, Vector3 direction, float size, EventType eventType)
             => Handles.ArrowHandleCap(controlID, startPos, Quaternion.LookRotation(direction), size, eventType);
 
-        private enum ExtentionLimit
+        private enum ExtensionMoved
         {
+            NONE,
             UP,
             FORWARD,
             RIGHT
         }
 
-        private void DrawExtentionLimit(ExtentionLimit limitType)
+        private void DrawExtensionLimit(ExtensionMoved limitType)
         {
+            if(limitType == ExtensionMoved.NONE) return;
+
             Vector3[] bounds = new Vector3[4];
 
             Color fadeColor = Color.white;
             Color lineColor = Color.white;
+            
+            float centerX = _module.ModuleData.CenterOffset.x;
+            float centerY = _module.ModuleData.CenterOffset.y;
+            float centerZ = _module.ModuleData.CenterOffset.z;
 
-            float x = _module.ModuleData.Extension.x / 2f + _module.ModuleData.CenterOffset.x;
-            float y = _module.ModuleData.Extension.y / 2f + _module.ModuleData.CenterOffset.y;
-            float z = _module.ModuleData.Extension.z / 2f + _module.ModuleData.CenterOffset.z;
+            float halfX = _module.ModuleData.Extension.x / 2f;
+            float halfY = _module.ModuleData.Extension.y / 2f;
+            float halfZ = _module.ModuleData.Extension.z / 2f;
+
+            float x = centerX + halfX;
+            float y = centerY + halfY;
+            float z = centerZ + halfZ;
 
             switch (limitType)
             {
-                case ExtentionLimit.UP:
-                    Handles.color = _yAxisColor;
+                case ExtensionMoved.UP:
 
-                    bounds[0] = new Vector3(x, y, z);
-                    bounds[1] = new Vector3(-x, y, -z);
-                    bounds[2] = new Vector3(-x, y, z);
-                    bounds[3] = new Vector3(x, y, -z);
+                    bounds[0] = new Vector3(-x, +y, -z);
+                    bounds[1] = new Vector3(+x, +y, -z);
+                    bounds[2] = new Vector3(+x, +y, +z);
+                    bounds[3] = new Vector3(-x, +y, +z);
 
                     lineColor = _yAxisColor;
                     fadeColor = _yAxisColor;
                     break;
 
-                case ExtentionLimit.FORWARD:
+                case ExtensionMoved.FORWARD:
 
+                    bounds[0] = new Vector3(-x, -halfY + centerY, +z);
+                    bounds[1] = new Vector3(+x, -halfY + centerY, +z);
+                    bounds[2] = new Vector3(+x, +halfY + centerY, +z);
+                    bounds[3] = new Vector3(-x, +halfY + centerY, +z);
 
                     lineColor = _zAxisColor;
                     fadeColor = _zAxisColor;
 
                     break;
 
-                case ExtentionLimit.RIGHT:
-                    
+                case ExtensionMoved.RIGHT:
+
+                    bounds[0] = new Vector3(+x, -halfY + centerY, -z);
+                    bounds[1] = new Vector3(+x, +halfY + centerY, -z);
+                    bounds[2] = new Vector3(+x, +halfY + centerY, +z);
+                    bounds[3] = new Vector3(+x, -halfY + centerY, +z);
+
                     lineColor = _xAxisColor;
                     fadeColor = _xAxisColor;
                     break;
             }
 
-            fadeColor.a = 0.25f;
+            fadeColor.a = 0.1f;
 
             Handles.DrawSolidRectangleWithOutline(bounds, fadeColor, lineColor);
         }
