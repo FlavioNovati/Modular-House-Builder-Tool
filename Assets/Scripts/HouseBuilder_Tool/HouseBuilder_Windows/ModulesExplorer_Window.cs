@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         {
             s_assetPath = assetPath;
             //Get Icon Asset
-            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{s_assetPath}HouseBuilder_Art/ModuleEditorIcon.png", typeof(Texture));
+            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{s_assetPath}HouseBuilder_Art/SearchIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Module Explorer", windowIcon, "Tool to edit modules");
 
             //Create Window
@@ -61,6 +62,16 @@ namespace Tool.ModularHouseBuilder.SubTool
 
                 _toolbarGUIContent[i] = new GUIContent(tabTexture, tabDescription);
                 _explorerTabs[i].Name = type.ToAssetName();
+
+                //Get Modules Data
+                string path = $"{s_assetPath}/{type.ToFolderName()}";
+                List<UnityEngine.Object> datas = AssetDatabase.LoadAllAssetsAtPath(path).ToList();
+
+                //Filter assets
+                //IEnumerable<ModuleData> modulesData = datas.Where(moduleData => moduleData.GetType() == typeof(ScriptableObject));
+
+                //Assign assets
+                
             }
 
             //Create tab options
@@ -138,7 +149,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         private void GetAssets()
         {
             //ist<ModuleData> AllModulesData;
-
+            //Update Visual
         }
     }
 }

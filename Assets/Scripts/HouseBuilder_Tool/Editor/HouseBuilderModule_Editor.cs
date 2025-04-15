@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using System.Security.Policy;
 
 namespace Tool.ModularHouseBuilder
 {
@@ -9,6 +8,7 @@ namespace Tool.ModularHouseBuilder
     public class HouseBuilderModule_Editor : Editor
     {
         const float HANDLE_SIZE = 0.25f;
+        const float HANDLE_SELECTED_SIZE = 0.3f;
         const float HANDLE_DISTANCE = 0.15f;
 
         private Color _xAxisColor = Color.red;
@@ -21,8 +21,16 @@ namespace Tool.ModularHouseBuilder
         private bool _useBoundsForCollisions = true;
         private int _nearestHandle;
         private Vector2 _previousMousePos;
-
+        
+        private enum ExtensionMoved
+        {
+            NONE,
+            UP,
+            FORWARD,
+            RIGHT
+        }
         private ExtensionMoved _movedExtension;
+
 
         void OnEnable()
         {
@@ -68,15 +76,18 @@ namespace Tool.ModularHouseBuilder
                 hoverIndex = HandleUtility.nearestControl;
 
                 Handles.color = _yAxisColor;
-                DrawHandleCap(11, yHandlePos + yHandleOffset, Vector3.up, HANDLE_SIZE, EventType.Repaint);
+                float yHanldeSize = hoverIndex == 11 ? HANDLE_SELECTED_SIZE : HANDLE_SIZE;
+                DrawHandleCap(11, yHandlePos + yHandleOffset, Vector3.up, yHanldeSize, EventType.Repaint);
                 Handles.DotHandleCap(-1, yHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
 
                 Handles.color = _xAxisColor;
-                DrawHandleCap(12, xHandlePos + xHandleOffset, Vector3.right, HANDLE_SIZE, EventType.Repaint);
+                float xHanldeSize = hoverIndex == 12 ? HANDLE_SELECTED_SIZE : HANDLE_SIZE;
+                DrawHandleCap(12, xHandlePos + xHandleOffset, Vector3.right, xHanldeSize, EventType.Repaint);
                 Handles.DotHandleCap(-1, xHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
 
                 Handles.color = _zAxisColor;
-                DrawHandleCap(13, zHandlePos + zHandleOffset, Vector3.forward, HANDLE_SIZE, EventType.Repaint);
+                float zHanldeSize = hoverIndex == 13 ? HANDLE_SELECTED_SIZE : HANDLE_SIZE;
+                DrawHandleCap(13, zHandlePos + zHandleOffset, Vector3.forward, zHanldeSize, EventType.Repaint);
                 Handles.DotHandleCap(-1, zHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
 
                 DrawExtensionLimit(_movedExtension);
@@ -142,21 +153,13 @@ namespace Tool.ModularHouseBuilder
             {
                 _nearestHandle = -1;
                 _previousMousePos = Vector2.zero;
-
                 _movedExtension = ExtensionMoved.NONE;
+                HandleUtility.AddDefaultControl(0);
             }
         }
 
         private void DrawHandleCap(int controlID, Vector3 startPos, Vector3 direction, float size, EventType eventType)
             => Handles.ArrowHandleCap(controlID, startPos, Quaternion.LookRotation(direction), size, eventType);
-
-        private enum ExtensionMoved
-        {
-            NONE,
-            UP,
-            FORWARD,
-            RIGHT
-        }
 
         private void DrawExtensionLimit(ExtensionMoved limitType)
         {
@@ -201,7 +204,6 @@ namespace Tool.ModularHouseBuilder
 
                     lineColor = _zAxisColor;
                     fadeColor = _zAxisColor;
-
                     break;
 
                 case ExtensionMoved.RIGHT:
@@ -218,6 +220,7 @@ namespace Tool.ModularHouseBuilder
 
             fadeColor.a = 0.1f;
 
+            Handles.color = Color.white;
             Handles.DrawSolidRectangleWithOutline(bounds, fadeColor, lineColor);
         }
 
