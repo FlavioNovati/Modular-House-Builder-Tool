@@ -24,10 +24,10 @@ namespace Tool.ModularHouseBuilder.SubTool
         private Vector3 _meshScale = Vector3.one;
         private bool _offsetByHalfHeight = false;
 
-        public static void OpenModuleCreation_Window(Type dockNextTo)
+        public static void OpenModuleCreation_Window(string artAssetPath, Type dockNextTo)
         {
             //Get Icon Asset
-            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath("Assets/Scripts/HouseBuilder_Tool/HouseBuilder_Art/ModuleIcon.png", typeof(Texture));
+            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{artAssetPath}ModuleIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Module Creator", windowIcon, "Tool to create modules");
 
             ModuleCreation_Window window = GetWindow<ModuleCreation_Window>("", true, dockNextTo);

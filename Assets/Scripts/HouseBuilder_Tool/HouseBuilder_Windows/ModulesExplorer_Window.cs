@@ -1,21 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.MessageBox;
 
 namespace Tool.ModularHouseBuilder.SubTool
 {
     public class ModulesExplorer_Window : EditorWindow
     {
-        private static string s_assetPath;
+        private static string s_artAssetsPath;
         
         public static void OpenExplorer_Window(string assetPath, Type dockNextTo)
         {
-            s_assetPath = assetPath;
+            s_artAssetsPath = assetPath;
             //Get Icon Asset
-            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{s_assetPath}HouseBuilder_Art/SearchIcon.png", typeof(Texture));
+            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{s_artAssetsPath}SearchIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Module Explorer", windowIcon, "Tool to edit modules");
 
             //Create Window
@@ -34,6 +34,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         {
             public string Name;
             public List<ModuleData> ModulesData;
+            public GUIStyle GUIStyle;
         }
         private ExplorerTabData[] _explorerTabs;
 
@@ -57,14 +58,25 @@ namespace Tool.ModularHouseBuilder.SubTool
             {
                 ModuleType type = ModuleTypeUtils.ModuleTypeFromInt(i);
 
+                //Get all information about tab
                 string tabDescription = type.ToDescription();
                 Texture tabTexture = type.ToTexture();
 
                 _toolbarGUIContent[i] = new GUIContent(tabTexture, tabDescription);
                 _explorerTabs[i].Name = type.ToAssetName();
 
+                //Asset name style
+                GUIStyle titleStyle = new GUIStyle()
+                {
+                    fontSize = 30,
+                    fontStyle = FontStyle.Bold,
+                    alignment = TextAnchor.MiddleCenter
+                };
+                titleStyle.normal.textColor = Color.white;
+                _explorerTabs[i].GUIStyle = titleStyle;
+
                 //Get Modules Data
-                string path = $"{s_assetPath}/{type.ToFolderName()}";
+                string path = $"{s_artAssetsPath}/{type.ToFolderName()}";
                 List<UnityEngine.Object> datas = AssetDatabase.LoadAllAssetsAtPath(path).ToList();
 
                 //Filter assets
@@ -82,8 +94,8 @@ namespace Tool.ModularHouseBuilder.SubTool
             };
 
             //SET UP SEARCH BAR
-            Texture searchIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{s_assetPath}HouseBuilder_Art/SearchIcon.png", typeof(Texture));
-            _searchGUIContent = new GUIContent(searchIcon);
+            Texture searchIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{s_artAssetsPath}SearchIcon.png", typeof(Texture));
+            _searchGUIContent = new GUIContent("", searchIcon);
             _searchGUIOptions = new GUILayoutOption[]
             {
                 GUILayout.ExpandWidth(true),
@@ -103,29 +115,16 @@ namespace Tool.ModularHouseBuilder.SubTool
             Rect windowRect = position;
 
             //Show all modules of the selected tab
-
             ExplorerTabData tab = _explorerTabs[_selectedTab];
+
             ModuleType moduleType = ModuleTypeUtils.ModuleTypeFromInt(_selectedTab);
+            //Draw Label For Tab Name
+            GUILayout.Label(tab.Name, tab.GUIStyle);
 
-            //Show Asset Name
-            GUIStyle titleStyle = new GUIStyle()
-            {
-                fontSize = 30,
-                fontStyle = FontStyle.Bold,
-                padding = new RectOffset(5, 0, 0, 0),
-            };
-            titleStyle.normal.textColor = Color.white;
-            
-
-            GUILayout.Label(tab.Name, titleStyle);
-            
             //SEARCH BAR
             //Draw Seach bar icon
-            using(new GUILayout.HorizontalScope())
-            {
-                GUILayout.Label(_searchGUIContent);
-                _searchInput = GUILayout.TextField(_searchInput, _searchGUIOptions);
-            }
+            GUILayout.Label(_searchGUIContent);
+            _searchInput = GUILayout.TextField(_searchInput, _searchGUIOptions);
 
             //Show assets
             //TODO: CONTINUE

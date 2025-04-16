@@ -7,13 +7,13 @@ namespace Tool.ModularHouseBuilder
 {
     public class ModularHouseBuilder : EditorWindow
     {
-        const string TOOL_FOLDER_PATH = "Assets/Scripts/HouseBuilder_Tool/";
+        const string TOOL_ART_FOLDER_PATH = "Assets/Scripts/HouseBuilder_Tool/HouseBuilder_Art/";
 
         [MenuItem("Tools/House Builder")]
         public static void OpenHouseBuilder()
         {
             //Get Icon Asset
-            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_FOLDER_PATH}HouseBuilder_Art/MainIcon.png", typeof(Texture));
+            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_ART_FOLDER_PATH}MainIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Modular House Builder", windowIcon, "Tool to create modular structures");
 
             //Create Window
@@ -35,19 +35,19 @@ namespace Tool.ModularHouseBuilder
                 GUILayout.ExpandWidth(true),
             };
 
-            Texture icon = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_FOLDER_PATH}HouseBuilder_Art/OpenIcon.png", typeof(Texture));
+            Texture icon = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_ART_FOLDER_PATH}OpenIcon.png", typeof(Texture));
             _openAssetsButtonContent = new GUIContent("Display Assets", icon);
         }
 
         private void OnDisable()
         {
-            //this.EndWindows();
+            
         }
 
         private void OnGUI()
         {
             if(GUILayout.Button("Create New Module", GUILayout.ExpandWidth(true)))
-                ModuleCreation_Window.OpenModuleCreation_Window(typeof(ModularHouseBuilder));
+                ModuleCreation_Window.OpenModuleCreation_Window(TOOL_ART_FOLDER_PATH, typeof(ModularHouseBuilder));
 
             if(GUILayout.Button("Create New Building", GUILayout.ExpandWidth(true)))
             {
@@ -55,7 +55,7 @@ namespace Tool.ModularHouseBuilder
             }
 
             if (GUILayout.Button(_openAssetsButtonContent, _openAssetsButtonOptions))
-                ModulesExplorer_Window.OpenExplorer_Window(TOOL_FOLDER_PATH, typeof(ModularHouseBuilder));
+                ModulesExplorer_Window.OpenExplorer_Window(TOOL_ART_FOLDER_PATH, typeof(ModularHouseBuilder));
         }
     }
 }
