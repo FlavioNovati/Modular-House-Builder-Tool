@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7da09350c191f84889edcbf07a15c2d, type: 3}
-  m_Name: ModuleData_Wall_Test
+  m_Name: ModuleData_Wall_Test 1
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 2141532076025820398, guid: a812f627f2678414a816d6d46b6a9876, type: 3}
-  Extension: {x: 2.1042538, y: 1.229887, z: 2.1042545}
+  Prefab: {fileID: 965958321748361713, guid: aedf77467053cbe4b96ca557bcf2d678, type: 3}
+  Extension: {x: 2.1042538, y: 1.2298867, z: 2.1042538}
   Rotation: {x: -90, y: 0, z: 0}
   CenterOffset: {x: 0, y: 0.6149433, z: 0}
-  PrefabAssetPath: Assets/Level/Prefab/Building_Modules/Walls/Module_Wall_Test.prefab
+  PrefabAssetPath: Assets/Level/Prefab/Building_Modules/Walls/Module_Wall_Test 1.prefab
   ModuleType: 0
-  Preview: {fileID: 0}
+  Preview: {fileID: 7853449062886713960, guid: 0000000000000000d000000000000000, type: 0}

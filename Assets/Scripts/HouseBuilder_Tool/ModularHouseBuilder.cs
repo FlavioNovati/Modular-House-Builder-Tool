@@ -8,6 +8,7 @@ namespace Tool.ModularHouseBuilder
     public class ModularHouseBuilder : EditorWindow
     {
         const string TOOL_ART_FOLDER_PATH = "Assets/Scripts/HouseBuilder_Tool/HouseBuilder_Art/";
+        const string TOOL_ASSET_FOLDER_PATH = "Assets/Level/Prefab/Building_Modules/";
 
         [MenuItem("Tools/House Builder")]
         public static void OpenHouseBuilder()
@@ -55,7 +56,7 @@ namespace Tool.ModularHouseBuilder
             }
 
             if (GUILayout.Button(_openAssetsButtonContent, _openAssetsButtonOptions))
-                ModulesExplorer_Window.OpenExplorer_Window(TOOL_ART_FOLDER_PATH, typeof(ModularHouseBuilder));
+                ModulesExplorer_Window.OpenExplorer_Window(TOOL_ART_FOLDER_PATH, TOOL_ASSET_FOLDER_PATH, typeof(ModularHouseBuilder));
         }
     }
 }

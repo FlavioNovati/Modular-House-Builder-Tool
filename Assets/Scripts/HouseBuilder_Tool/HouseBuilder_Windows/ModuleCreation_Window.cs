@@ -172,7 +172,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             
             //Parent
             // -MESH- (Mesh Holder)
-            //  Mesh (Actual Mesh)
+            //    Mesh (Actual Mesh)
 
             //Create Parent
             GameObject prefab = new GameObject(name, typeof(HouseBuilderModule), typeof(BoxCollider));
@@ -222,13 +222,12 @@ namespace Tool.ModularHouseBuilder.SubTool
             boxCollider.size = colliderSize;
             boxCollider.center = offset;
 
-
             //Save Prefab
             PrefabUtility.SaveAsPrefabAsset(prefab, modulePath);
 
             //Create Scriptable
             CreateAndLinkData(name, folderPath, modulePath, colliderSize, offset);
-
+            
             //Destroy instanciated game object in scene
             DestroyImmediate(prefab);
 
@@ -240,25 +239,29 @@ namespace Tool.ModularHouseBuilder.SubTool
         {
             //Instanciate Scriptable
             ModuleData module_Data = ScriptableObject.CreateInstance<ModuleData>();
-            module_Data.Prefab = (GameObject)AssetDatabase.LoadAssetAtPath(prefabAssetPath, typeof(GameObject));
-            //Link Data
-            module_Data.Prefab.GetComponent<HouseBuilderModule>().ModuleData = module_Data;
-
+            GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(prefabAssetPath, typeof(GameObject));
+            module_Data.Prefab = prefab;
+            
             //Get Path
             string moduleDataPath = $"{saveFolderPath}/{SCRIPTABLE_PREFIX}{name}.asset";
             moduleDataPath = AssetDatabase.GenerateUniqueAssetPath(moduleDataPath);
 
             //Create Scriptable Asset
-            module_Data.SetPreview(null);
             module_Data.ModuleType = _moduleType;
             module_Data.Extension = extension;
             module_Data.CenterOffset = centerOffset;
             module_Data.Rotation = _meshRotation;
+            module_Data.PrefabAssetPath = prefabAssetPath;
+            module_Data.Preview = AssetPreview.GetMiniThumbnail(prefab);
 
             //Create Asset
             AssetDatabase.CreateAsset(module_Data, moduleDataPath);
+
+            //Link Data
+            module_Data.Prefab.GetComponent<HouseBuilderModule>().ModuleData = module_Data;
+
             //Update Prefab
-            PrefabUtility.SavePrefabAsset(module_Data.Prefab);
+            PrefabUtility.SavePrefabAsset(prefab);
         }
 
         private string GetAssetFolderPath(ModuleType moduleType) => $"{PREFAB_FOLDER_PATH}/{PREFAB_FOLDER_NAME}/{moduleType.ToFolderName()}";

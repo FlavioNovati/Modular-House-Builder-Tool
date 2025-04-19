@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using Unity.VisualScripting;
 
 namespace Tool.ModularHouseBuilder
 {
@@ -226,12 +227,30 @@ namespace Tool.ModularHouseBuilder
 
         public override void OnInspectorGUI()
         {
+            if (PrefabStageUtility.GetCurrentPrefabStage() == null)
+            {
+                if (GUILayout.Button("Edit Module", GUILayout.ExpandWidth(true)))
+                {
+                    string assetPath = _module.ModuleData.PrefabAssetPath;
+                    PrefabStageUtility.OpenPrefab(assetPath);
+                }
+                return;
+            }
+
             _useBoundsForCollisions = GUILayout.Toggle(_useBoundsForCollisions, "Use Bounds for Collision", GUILayout.ExpandWidth(true));
             if(_useBoundsForCollisions)
                 if (GUILayout.Button("Update Collider", GUILayout.ExpandWidth(true)))
                     UpdateCollider();
+
             if (GUILayout.Button("Reset Extension", GUILayout.ExpandWidth(true)))
                 ResetExtension();
+            
+            GUILayout.Space(5f);
+            if(GUILayout.Button("Update Preview", GUILayout.ExpandWidth(true)))
+            {
+                _module.ModuleData.Preview = AssetPreview.GetAssetPreview(_module.ModuleData.Prefab);
+                EditorUtility.SetDirty(_module.ModuleData);
+            }
         }
 
         private void UpdateCollider()

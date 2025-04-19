@@ -12,7 +12,6 @@ namespace Tool.ModularHouseBuilder
         void OnEnable()
         {
             _moduleData = (ModuleData)target;
-            _moduleData.SetPreview(AssetPreview.GetAssetPreview(_moduleData.Prefab));
         }
 
         public override void OnInspectorGUI()
@@ -23,17 +22,22 @@ namespace Tool.ModularHouseBuilder
             GUIContent typeTexture = new GUIContent(" Preview", _moduleData.ModuleType.ToTexture());
             GUILayout.Label(typeTexture, GUILayout.ExpandWidth(true));
 
-            //Draw Preview
-            GUIContent textureContent = new GUIContent(_moduleData.ModulePreview);
-            //Preview Settings
-            GUILayoutOption[] textureOptions =
+            if (_moduleData.Preview != null)
             {
-                GUILayout.Height(_moduleData.ModulePreview.height),
-                GUILayout.Width(_moduleData.ModulePreview.width),
-            };
+                //Draw Preview
+                GUIContent textureContent = new GUIContent(_moduleData.Preview);
+                //Preview Settings
+                GUILayoutOption[] textureOptions =
+                {
+                    GUILayout.Height(_moduleData.Preview.height),
+                    GUILayout.Width(_moduleData.Preview.width),
+                };
 
-            //Draw Preview as a label
-            GUILayout.Label(textureContent, textureOptions);
+                //Draw Preview as a label
+                GUILayout.Label(textureContent, textureOptions);
+            }
+            else
+                GUILayout.Label("NO PREVIEW AVAILABLE");
 
             //Open Prefab Button
             if (GUILayout.Button("Open Prefab", GUILayout.ExpandWidth(true)))
