@@ -13,8 +13,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         public delegate void WindowCallback(ModuleData moduleData);
         public static event WindowCallback OnModuleSelected;
 
-        private static string s_artAssetsPath;
-        private static string s_assetsPath;
+        private string _assetsPath;
 
         private ModuleData SelectedModuleProperty
         {
@@ -28,13 +27,12 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private ModuleData _selectedModule;
 
-        public static void OpenExplorer_Window(string artAssetPath, string assetPath, Type dockNextTo)
+        public static void OpenExplorer_Window(Type dockNextTo)
         {
-            s_artAssetsPath = artAssetPath;
-            s_assetsPath = assetPath;
+            string artAssetPath = EditorPrefs.GetString("ModularHouseBuilder_ART_FOLDER");
 
             //Get Icon Asset
-            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{s_artAssetsPath}SearchIcon.png", typeof(Texture));
+            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{artAssetPath}SearchIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Module Explorer", windowIcon, "Tool to edit modules");
 
             //Create Window
@@ -70,11 +68,8 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private void OnEnable()
         {
-            if(s_assetsPath ==  null)
-            {
-                Close();
-                return;
-            }
+            if (string.IsNullOrEmpty(_assetsPath))
+                _assetsPath = EditorPrefs.GetString("ModularHouseBuilder_MODULES_FOLDER");
 
             //SET UP TABS
             _selectedTab = 0;
@@ -111,7 +106,7 @@ namespace Tool.ModularHouseBuilder.SubTool
                 
 
                 //Get Modules Data
-                string path = $"{s_assetsPath}{type.ToFolderName()}/";
+                string path = $"{_assetsPath}{type.ToFolderName()}/";
                 string[] assetsPath = Directory.GetFiles(path, "*.asset");
                 List<ModuleData> modules = new List<ModuleData>();
 
@@ -174,14 +169,18 @@ namespace Tool.ModularHouseBuilder.SubTool
             
             if (SelectedModuleProperty == null)
             {
+                ExplorerTabData tab = _explorerTabs[_selectedTab];
+
+                //Update all previews
+                if (GUILayout.Button("Update All Preview", GUILayout.ExpandWidth(true)))
+                    UpdateAllPreviews(tab.ModulesData);
+
                 //Search Bar
                 GUILayout.Space(15f);
                 GUILayout.Label("Search", GUILayout.ExpandWidth(true));
                 _searchInput = GUILayout.TextField(_searchInput, _searchGUIOptions);
                 GUILayout.Space(15f);
 
-                //Show all modules of the selected tab
-                ExplorerTabData tab = _explorerTabs[_selectedTab];
 
                 //Draw Label For Tab Name
                 GUILayout.Label(tab.Name, tab.GUIStyle);
@@ -281,6 +280,17 @@ namespace Tool.ModularHouseBuilder.SubTool
             }
 
             return preview;
+        }
+
+        private void UpdateAllPreviews(List<ModuleData> modules)
+        {
+            foreach(ModuleData moduleData in modules)
+            {
+                Texture texture = AssetPreview.GetAssetPreview(moduleData.Prefab);
+                moduleData.Preview = texture;
+            }
+
+            Repaint();
         }
     }
 }

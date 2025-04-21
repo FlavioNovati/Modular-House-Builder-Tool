@@ -8,12 +8,16 @@ namespace Tool.ModularHouseBuilder
     public class ModularHouseBuilder : EditorWindow
     {
         const string TOOL_ART_FOLDER_PATH = "Assets/Scripts/HouseBuilder_Tool/HouseBuilder_Art/";
-        const string TOOL_MODULES_FOLDER_PATH = "Assets/Level/Prefabs/Building_Modules/";
         const string PREFAB_FOLDER_PATH = "Assets/Level/Prefabs";
 
         [MenuItem("Tools/House Builder")]
         public static void OpenHouseBuilder()
         {
+            if (!EditorPrefs.HasKey("ModularHouseBuilder_PREFAB_FOLDER"))
+                EditorPrefs.SetString("ModularHouseBuilder_PREFAB_FOLDER", PREFAB_FOLDER_PATH);
+            if(!EditorPrefs.HasKey("ModularHouseBuilder_ART_FOLDER"))
+                EditorPrefs.SetString("ModularHouseBuilder_ART_FOLDER", TOOL_ART_FOLDER_PATH);
+
             //Get Icon Asset
             Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_ART_FOLDER_PATH}MainIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Modular House Builder", windowIcon, "Tool to create modular structures");
@@ -49,7 +53,7 @@ namespace Tool.ModularHouseBuilder
         private void OnGUI()
         {
             if(GUILayout.Button("Create New Module", GUILayout.ExpandWidth(true)))
-                ModuleCreation_Window.OpenModuleCreation_Window(TOOL_ART_FOLDER_PATH, PREFAB_FOLDER_PATH, typeof(ModularHouseBuilder));
+                ModuleCreation_Window.OpenModuleCreation_Window(typeof(ModularHouseBuilder));
 
             if(GUILayout.Button("Create New Building", GUILayout.ExpandWidth(true)))
             {
@@ -57,7 +61,7 @@ namespace Tool.ModularHouseBuilder
             }
 
             if (GUILayout.Button(_openAssetsButtonContent, _openAssetsButtonOptions))
-                ModulesExplorer_Window.OpenExplorer_Window(TOOL_ART_FOLDER_PATH, TOOL_MODULES_FOLDER_PATH, typeof(ModularHouseBuilder));
+                ModulesExplorer_Window.OpenExplorer_Window(typeof(ModularHouseBuilder));
         }
     }
 }
