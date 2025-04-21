@@ -8,10 +8,19 @@ namespace Tool.ModularHouseBuilder
     public class ModuleData_Editor : Editor
     {
         private ModuleData _moduleData;
+        private GUIStyle _moduleNameStyle;
 
         void OnEnable()
         {
             _moduleData = (ModuleData)target;
+
+            _moduleNameStyle = new GUIStyle()
+            {
+                fontSize = 30,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter
+            };
+            _moduleNameStyle.normal.textColor = Color.white;
         }
 
         public override void OnInspectorGUI()
@@ -19,6 +28,7 @@ namespace Tool.ModularHouseBuilder
             float rectWidth = EditorGUIUtility.currentViewWidth;
 
             //Title
+            GUILayout.Label(_moduleData.ModuleName, _moduleNameStyle);
             GUIContent typeTexture = new GUIContent(" Preview", _moduleData.ModuleType.ToTexture());
             GUILayout.Label(typeTexture, GUILayout.ExpandWidth(true));
 

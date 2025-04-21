@@ -1,15 +1,30 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+using UnityEditor.SceneManagement;
 
 namespace Tool.ModularHouseBuilder.SubTool
 {
     public class ModulesExplorer_Window : EditorWindow
     {
+        public delegate void WindowCallback(ModuleData moduleData);
+        public static event WindowCallback OnModuleSelected;
+
         private static string s_artAssetsPath;
         private static string s_assetsPath;
+
+        private ModuleData SelectedModuleProperty
+        {
+            get => _selectedModule;
+            set
+            {
+                _selectedModule = value;
+                OnModuleSelected?.Invoke(value);
+            }
+        }
 
         private ModuleData _selectedModule;
 
@@ -51,8 +66,16 @@ namespace Tool.ModularHouseBuilder.SubTool
         private Vector2 _scrollPos;
         private GUILayoutOption[] _scrollBarGUIOptions;
 
+        private GUIStyle _moduleNameStyle;
+
         private void OnEnable()
         {
+            if(s_assetsPath ==  null)
+            {
+                Close();
+                return;
+            }
+
             //SET UP TABS
             _selectedTab = 0;
 
@@ -95,6 +118,7 @@ namespace Tool.ModularHouseBuilder.SubTool
                 //Load All assets
                 foreach (string assetPath in assetsPath)
                     modules.Add(AssetDatabase.LoadAssetAtPath<ModuleData>(assetPath));
+                modules.Reverse();
 
                 //Add Module Data
                 _explorerTabs[i].ModulesData = modules;
@@ -119,7 +143,15 @@ namespace Tool.ModularHouseBuilder.SubTool
             {
                 GUILayout.ExpandWidth(true),
                 GUILayout.ExpandHeight(true),
+            };  
+
+            _moduleNameStyle = new GUIStyle()
+            {
+                fontSize = 30,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter
             };
+            _moduleNameStyle.normal.textColor = Color.white;
 
             Repaint();
         }
@@ -131,17 +163,35 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private void OnGUI()
         {
+            int currentTab = _selectedTab;
             _selectedTab = GUILayout.Toolbar(_selectedTab, _toolbarGUIContent, _toolbarGUIOptions);
+            
+            //Check if user changed tab
+            if(currentTab != _selectedTab)
+                SelectedModuleProperty = null;
+
             Rect windowRect = position;
+            
+            if (SelectedModuleProperty == null)
+            {
+                //Search Bar
+                GUILayout.Space(15f);
+                GUILayout.Label("Search", GUILayout.ExpandWidth(true));
+                _searchInput = GUILayout.TextField(_searchInput, _searchGUIOptions);
+                GUILayout.Space(15f);
 
-            //Show all modules of the selected tab
-            ExplorerTabData tab = _explorerTabs[_selectedTab];
+                //Show all modules of the selected tab
+                ExplorerTabData tab = _explorerTabs[_selectedTab];
 
-            ModuleType moduleType = ModuleTypeUtils.ModuleTypeFromInt(_selectedTab);
-            //Draw Label For Tab Name
-            GUILayout.Label(tab.Name, tab.GUIStyle);
-
-            DrawModules(tab.ModulesData);
+                //Draw Label For Tab Name
+                GUILayout.Label(tab.Name, tab.GUIStyle);
+                
+                DrawModules(tab.ModulesData);
+            }
+            else
+            {
+                DrawModule(SelectedModuleProperty);
+            }
 
             //Input Handling
             Event currentEvent = Event.current;
@@ -156,38 +206,65 @@ namespace Tool.ModularHouseBuilder.SubTool
             }
         }
 
+        private void DrawModule(ModuleData moduleData)
+        {
+            GUILayout.Label(moduleData.ModuleName, _moduleNameStyle);
+            GUILayout.Space(15f);
+            GUILayout.Label(moduleData.Preview, new GUIStyle() { alignment = TextAnchor.MiddleCenter } );
+            GUILayout.Space(15f);
+            using (new GUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Open Prefab"))
+                {
+                    string prefabPath = AssetDatabase.GetAssetPath(moduleData.Prefab);
+                    PrefabStageUtility.OpenPrefab(prefabPath);
+                }
+                if (GUILayout.Button("Back"))
+                    SelectedModuleProperty = null;
+            }
+
+        }
+
         private void DrawModules(List<ModuleData> moduleDatas)
         {
-            //Search Bar
-            GUILayout.Label("Search", GUILayout.ExpandWidth(true));
-            _searchInput = GUILayout.TextField(_searchInput, _searchGUIOptions);
-
             Rect windowRect = position;
-            Texture texture = GetTexture(moduleDatas[0]);
-            Vector2 textureSize = new Vector2(texture.width, texture.height);
-            int texturePerWidth = (int)(windowRect.width / texture.width);
-            if (texturePerWidth <= 0)
-                texturePerWidth = 1;
+            Vector2 textureSize = new Vector2(128, 128);
 
+            //Get how many modules can be drawn on a row
+            int modulesPerRow = Mathf.FloorToInt(windowRect.width / textureSize.x);
+            if (modulesPerRow <= 0)
+                modulesPerRow = 1;
+
+            List<ModuleData> modulesToShow = new List<ModuleData>();
+
+            //Apply search Filter
+            if (!string.IsNullOrEmpty(_searchInput))
+                modulesToShow.AddRange(moduleDatas.Where(data => data.name.ToLower().Contains(_searchInput.ToLower())));
+            else
+                modulesToShow.AddRange(moduleDatas);
+            
             //Draw All Moule in the current selected tab
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos, _scrollBarGUIOptions);
             {
-                for(int i = 0; i < moduleDatas.Count; i+= texturePerWidth)
+                int currentRow = 0;
+                int currentIndex = 0;
+                
+                do
                 {
-                    int endLineIndex = i + texturePerWidth;
-                    endLineIndex = Mathf.Clamp(endLineIndex, 0, moduleDatas.Count);
-
-                    List<ModuleData> modulesToShow = new List<ModuleData>(texturePerWidth);
-                    modulesToShow.AddRange( moduleDatas.GetRange(i, endLineIndex) );
-
-                    using (new EditorGUILayout.HorizontalScope())
+                    using (new GUILayout.VerticalScope())
                     {
-                        foreach(ModuleData moduleData in modulesToShow)
+                        using (new GUILayout.HorizontalScope())
                         {
-                            GUILayout.Button(moduleData.Preview);
+                            //Draw All modules on a row
+                            for (int i = 0; i < modulesPerRow && currentIndex < modulesToShow.Count; i++, currentIndex = modulesPerRow * currentRow + i)
+                            {
+                                if(GUILayout.Button(GetTexture(modulesToShow[currentIndex]), GUILayout.ExpandWidth(true)))
+                                    SelectedModuleProperty = modulesToShow[currentIndex];
+                            }
                         }
+                        currentRow++;
                     }
-                }
+                }while(currentIndex < modulesToShow.Count-1);
             }
             GUILayout.EndScrollView();
         }

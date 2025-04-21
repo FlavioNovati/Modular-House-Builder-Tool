@@ -10,6 +10,7 @@ namespace Tool.ModularHouseBuilder
         public Vector3 Rotation;
         public Vector3 CenterOffset;
         public string PrefabAssetPath;
+        public string ModuleName;
 
         public ModuleType ModuleType;
         public Texture Preview;

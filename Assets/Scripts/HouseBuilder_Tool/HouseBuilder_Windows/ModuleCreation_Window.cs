@@ -7,10 +7,11 @@ namespace Tool.ModularHouseBuilder.SubTool
 {
     public class ModuleCreation_Window : EditorWindow
     {
-        const string PREFAB_FOLDER_PATH = "Assets/Level/Prefab";
         const string PREFAB_FOLDER_NAME = "Building_Modules";
         const string PREFAB_PREFIX = "Module_";
         const string SCRIPTABLE_PREFIX = "ModuleData_";
+
+        private static string s_prefabFolderPath;
 
         private string _moduleName = null;
         private string _modulePath = null;
@@ -24,8 +25,10 @@ namespace Tool.ModularHouseBuilder.SubTool
         private Vector3 _meshScale = Vector3.one;
         private bool _offsetByHalfHeight = false;
 
-        public static void OpenModuleCreation_Window(string artAssetPath, Type dockNextTo)
+        public static void OpenModuleCreation_Window(string artAssetPath, string prefabFolderPath, Type dockNextTo)
         {
+            s_prefabFolderPath = prefabFolderPath;
+
             //Get Icon Asset
             Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{artAssetPath}ModuleIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Module Creator", windowIcon, "Tool to create modules");
@@ -40,11 +43,11 @@ namespace Tool.ModularHouseBuilder.SubTool
         private void OnEnable()
         {
             //Create Main Folder for assets
-            CreateModuleFolder(PREFAB_FOLDER_PATH, PREFAB_FOLDER_NAME);
+            CreateModuleFolder(s_prefabFolderPath, PREFAB_FOLDER_NAME);
 
             //Create Module Type Folders
             int enumEntries = Enum.GetValues(typeof(ModuleType)).Length;
-            string parentPath = $"{PREFAB_FOLDER_PATH}/{PREFAB_FOLDER_NAME}";
+            string parentPath = $"{s_prefabFolderPath}/{PREFAB_FOLDER_NAME}";
             
             for (int i = 0; i < enumEntries; i++)
             {
@@ -127,7 +130,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Ping Modules Folder", GUILayout.ExpandWidth(true)))
-                    EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath(PREFAB_FOLDER_PATH + "/" + PREFAB_FOLDER_NAME, typeof(object)));
+                    EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath(s_prefabFolderPath + "/" + PREFAB_FOLDER_NAME, typeof(object)));
 
                 if (!string.IsNullOrEmpty(_modulePath))
                 {
@@ -264,6 +267,6 @@ namespace Tool.ModularHouseBuilder.SubTool
             PrefabUtility.SavePrefabAsset(prefab);
         }
 
-        private string GetAssetFolderPath(ModuleType moduleType) => $"{PREFAB_FOLDER_PATH}/{PREFAB_FOLDER_NAME}/{moduleType.ToFolderName()}";
+        private string GetAssetFolderPath(ModuleType moduleType) => $"{s_prefabFolderPath}/{PREFAB_FOLDER_NAME}/{moduleType.ToFolderName()}";
     }
 }
