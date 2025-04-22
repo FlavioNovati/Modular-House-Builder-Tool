@@ -29,20 +29,49 @@ namespace Tool.ModularHouseBuilder
             window.name = "House Builder";
         }
 
-        private GUILayoutOption[] _openAssetsButtonOptions;
-        private GUIContent _openAssetsButtonContent;
+        private GUIContent _buildingCreationButtonContent;
+        private GUILayoutOption[] _buildingCreationButtonOptions;
+
+        private GUIContent _moduleCreationButtonContent;
+        private GUILayoutOption[] _moduleCreationButtonOptions;
+
+        private GUIContent _moduleButtonContent;
+        private GUILayoutOption[] _modulesButtonOptions;
 
         private void OnEnable()
         {
-            //this.BeginWindows();
+            //Create Module Settings
+            Texture createModuleTexture = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_ART_FOLDER_PATH}AddModuleIcon.png", typeof(Texture));
+            _moduleCreationButtonContent = new GUIContent(" Create New Module", createModuleTexture);
 
-            _openAssetsButtonOptions = new GUILayoutOption[]
+            _moduleCreationButtonOptions = new GUILayoutOption[]
             {
                 GUILayout.ExpandWidth(true),
+                GUILayout.ExpandHeight(true),
             };
 
-            Texture icon = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_ART_FOLDER_PATH}OpenIcon.png", typeof(Texture));
-            _openAssetsButtonContent = new GUIContent("Display Assets", icon);
+            //Create Building Settings
+            Texture createBuildingTexture = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_ART_FOLDER_PATH}NewBuildingIcon.png", typeof(Texture));
+            _buildingCreationButtonContent = new GUIContent(" Create New Building", createBuildingTexture);
+
+            _buildingCreationButtonOptions = new GUILayoutOption[]
+            {
+                GUILayout.ExpandWidth(true),
+                GUILayout.ExpandHeight(true),
+            };
+
+
+            //Open Module Settings
+            Texture openFolderTexture = (Texture)AssetDatabase.LoadAssetAtPath($"{TOOL_ART_FOLDER_PATH}SearchIcon.png", typeof(Texture));
+            _moduleButtonContent = new GUIContent(" Display Modules", openFolderTexture);
+
+            _modulesButtonOptions = new GUILayoutOption[]
+            {
+                GUILayout.ExpandWidth(true),
+                GUILayout.ExpandHeight(true),
+            };
+
+
         }
 
         private void OnDisable()
@@ -52,16 +81,21 @@ namespace Tool.ModularHouseBuilder
 
         private void OnGUI()
         {
-            if(GUILayout.Button("Create New Module", GUILayout.ExpandWidth(true)))
-                ModuleCreation_Window.OpenModuleCreation_Window(typeof(ModularHouseBuilder));
+            //Module Creation Button
+            if(GUILayout.Button(_moduleCreationButtonContent, _moduleCreationButtonOptions))
+                ModuleCreation_Window.OpenWindow(typeof(ModularHouseBuilder));
 
-            if(GUILayout.Button("Create New Building", GUILayout.ExpandWidth(true)))
-            {
-                
-            }
+            GUILayout.Space(5f);
 
-            if (GUILayout.Button(_openAssetsButtonContent, _openAssetsButtonOptions))
-                ModulesExplorer_Window.OpenExplorer_Window(typeof(ModularHouseBuilder));
+            //Building Creation Button
+            if (GUILayout.Button(_buildingCreationButtonContent, _buildingCreationButtonOptions))
+                BuildingCreation_Window.OpenWindow();
+
+            GUILayout.Space(5f);
+
+            //Module Explorer
+            if (GUILayout.Button(_moduleButtonContent, _modulesButtonOptions))
+                ModulesExplorer_Window.OpenWindow(typeof(ModularHouseBuilder));
         }
     }
 }

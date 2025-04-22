@@ -27,7 +27,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private ModuleData _selectedModule;
 
-        public static void OpenExplorer_Window(Type dockNextTo)
+        public static void OpenWindow(Type dockNextTo)
         {
             string artAssetPath = EditorPrefs.GetString("ModularHouseBuilder_ART_FOLDER");
 
@@ -213,7 +213,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             GUILayout.Space(15f);
             using (new GUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("Open Prefab"))
+                if (GUILayout.Button("OpenWindow Prefab"))
                 {
                     string prefabPath = AssetDatabase.GetAssetPath(moduleData.Prefab);
                     PrefabStageUtility.OpenPrefab(prefabPath);
