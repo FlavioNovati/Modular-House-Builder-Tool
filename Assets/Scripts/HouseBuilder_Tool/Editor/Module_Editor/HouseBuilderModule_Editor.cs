@@ -147,6 +147,7 @@ namespace Tool.ModularHouseBuilder
 
                 _movedExtension = movedExtention;
                 _previousMousePos = Event.current.mousePosition;
+                AssetDatabase.SaveAssets();
                 SceneView.RepaintAll();
             }
 

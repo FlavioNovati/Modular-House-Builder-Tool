@@ -89,7 +89,7 @@ namespace Tool.ModularHouseBuilder
 
             //Building Creation Button
             if (GUILayout.Button(_buildingCreationButtonContent, _buildingCreationButtonOptions))
-                BuildingCreation_Window.OpenWindow();
+                BuildingCreation_Window.OpenWindow(typeof(ModularHouseBuilder));
 
             GUILayout.Space(5f);
 
