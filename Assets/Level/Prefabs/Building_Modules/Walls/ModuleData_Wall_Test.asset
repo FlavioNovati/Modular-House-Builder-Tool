@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ModuleData_Wall_Test
   m_EditorClassIdentifier: 
   Prefab: {fileID: 2814776397656077634, guid: 526461c57b5336045b7957542812e6cb, type: 3}
-  Extension: {x: 2.0000007, y: 1.2298865, z: 0.20628302}
+  Extension: {x: 2.0000007, y: 1.2298869, z: 0.20628308}
   Rotation: {x: -90, y: 0, z: 0}
   CenterOffset: {x: 0, y: 0.61494327, z: 0}
   PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Walls/Module_Wall_Test.prefab

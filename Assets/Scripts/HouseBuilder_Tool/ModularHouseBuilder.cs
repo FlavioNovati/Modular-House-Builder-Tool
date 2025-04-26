@@ -98,7 +98,7 @@ namespace Tool.ModularHouseBuilder
             //Module Explorer
             if (GUILayout.Button(_moduleButtonContent, _modulesButtonOptions))
                 if(_explorerWindow == null)
-                    _explorerWindow = new ModulesExplorer_Window(typeof(ModularHouseBuilder));
+                    _explorerWindow = GetWindow<ModulesExplorer_Window>("", true);
         }
     }
 }
