@@ -11,10 +11,27 @@ namespace Tool.ModularHouseBuilder.SubTool
     public class ModulesExplorer_Window : EditorWindow
     {
         public delegate void WindowCallback(ModuleData moduleData);
-        public static event WindowCallback OnModuleSelected;
+        public event WindowCallback OnModuleSelected;
 
-        private string _assetsPath;
+        public delegate void WindowActionCallback();
+        public event WindowActionCallback OnWindowClosed;
+        public event WindowActionCallback OnWindowDestroyed;
 
+        public ModulesExplorer_Window(Type dockNextTo)
+        {
+            string artAssetPath = EditorPrefs.GetString("ModularHouseBuilder_ART_FOLDER");
+            
+            //Get Icon Asset
+            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{artAssetPath}SearchIcon.png", typeof(Texture));
+            GUIContent titleContent = new GUIContent("Module Explorer", windowIcon, "Tool to edit modules");
+
+            //Create Window
+            ModulesExplorer_Window window = GetWindow<ModulesExplorer_Window>("", true, dockNextTo);
+            //Assign Fancy Graphics
+            window.titleContent = titleContent;
+            window.name = "Module Explorer";
+        }
+        
         private ModuleData SelectedModuleProperty
         {
             get => _selectedModule;
@@ -26,21 +43,6 @@ namespace Tool.ModularHouseBuilder.SubTool
         }
 
         private ModuleData _selectedModule;
-
-        public static void OpenWindow(Type dockNextTo)
-        {
-            string artAssetPath = EditorPrefs.GetString("ModularHouseBuilder_ART_FOLDER");
-
-            //Get Icon Asset
-            Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{artAssetPath}SearchIcon.png", typeof(Texture));
-            GUIContent titleContent = new GUIContent("Module Explorer", windowIcon, "Tool to edit modules");
-
-            //Create Window
-            ModulesExplorer_Window window = GetWindow<ModulesExplorer_Window>("", true, dockNextTo);
-            //Assign Fancy Graphics
-            window.titleContent = titleContent;
-            window.name = "Module Explorer";
-        }
 
 
         //Tabs parameters
@@ -65,6 +67,8 @@ namespace Tool.ModularHouseBuilder.SubTool
         private GUILayoutOption[] _scrollBarGUIOptions;
 
         private GUIStyle _moduleNameStyle;
+        private string _assetsPath;
+        private bool _showModuleInfo = true;
 
         private void OnEnable()
         {
@@ -151,9 +155,11 @@ namespace Tool.ModularHouseBuilder.SubTool
             Repaint();
         }
 
-        private void OnDisable()
+        private void OnDisable() => OnWindowClosed?.Invoke();
+        private void OnDestroy()
         {
-            
+            OnWindowClosed?.Invoke();
+            OnWindowDestroyed?.Invoke();
         }
 
         private void OnGUI()
@@ -167,7 +173,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             Rect windowRect = position;
             
-            if (SelectedModuleProperty == null)
+            if (SelectedModuleProperty == null && _showModuleInfo)
             {
                 ExplorerTabData tab = _explorerTabs[_selectedTab];
 
@@ -187,7 +193,7 @@ namespace Tool.ModularHouseBuilder.SubTool
                 
                 DrawModules(tab.ModulesData);
             }
-            else
+            else if(SelectedModuleProperty != null)
             {
                 DrawModule(SelectedModuleProperty);
             }
@@ -293,6 +299,12 @@ namespace Tool.ModularHouseBuilder.SubTool
             }
             AssetDatabase.SaveAssets();
 
+            Repaint();
+        }
+
+        public void ShowModuleInfo(bool show)
+        {
+            _showModuleInfo = show;
             Repaint();
         }
     }

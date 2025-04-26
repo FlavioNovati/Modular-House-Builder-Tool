@@ -38,6 +38,8 @@ namespace Tool.ModularHouseBuilder
         private GUIContent _moduleButtonContent;
         private GUILayoutOption[] _modulesButtonOptions;
 
+        private ModulesExplorer_Window _explorerWindow;
+
         private void OnEnable()
         {
             //Create Module Settings
@@ -95,7 +97,8 @@ namespace Tool.ModularHouseBuilder
 
             //Module Explorer
             if (GUILayout.Button(_moduleButtonContent, _modulesButtonOptions))
-                ModulesExplorer_Window.OpenWindow(typeof(ModularHouseBuilder));
+                if(_explorerWindow == null)
+                    _explorerWindow = new ModulesExplorer_Window(typeof(ModularHouseBuilder));
         }
     }
 }

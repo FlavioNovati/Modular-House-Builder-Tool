@@ -65,7 +65,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             GUILayout.Space(10f);
             
             //Building Path
-            GUILayout.Label("Building Path: "+_buildingPath, GUILayout.ExpandWidth(true));
+            GUILayout.Label("Building BuildingPath: "+_buildingPath, GUILayout.ExpandWidth(true));
             GUILayout.Space(5f);
             //Change Asset final Path
             if (GUILayout.Button("Select Asset Folder", GUILayout.ExpandWidth(true)))
@@ -122,7 +122,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             BuildingData buildingData = ScriptableObject.CreateInstance<BuildingData>();
             buildingData.Name = _buildingName;
             buildingData.Description = _buildingDescription;
-            buildingData.Path = buildingPath;
+            buildingData.BuildingPath = buildingPath;
 
             AssetDatabase.CreateAsset(buildingData, dataPath);
 

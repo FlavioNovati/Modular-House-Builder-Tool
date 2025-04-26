@@ -83,6 +83,34 @@ namespace Tool.ModularHouseBuilder
             }
         }
 
+        public static string ToFormattedName(this ModuleType module)
+        {
+            switch (module)
+            {
+                case ModuleType.WALL:
+                    return "Wall\t\t\t\t";
+                case ModuleType.FLOOR:
+                    return "Floor\t\t\t";
+                case ModuleType.FLOOR_DECORATOR:
+                    return "Floor_Decorator\t\t";
+                case ModuleType.WALL_DECORATOR:
+                    return "Wall_Decorator\t\t";
+                case ModuleType.DOOR:
+                    return "Door\t\t\t";
+                case ModuleType.DOOR_FRAME:
+                    return "Door_Frame\t\t";
+                case ModuleType.WINDOW:
+                    return "Window\t\t\t";
+                case ModuleType.WINDOW_FRAME:
+                    return "Window_Frame\t\t";
+                case ModuleType.ROOF:
+                    return "Roof\t\t\t";
+
+                default:
+                    return "<ERROR WHILE GETTING FORMATTED ASSET NAME>";
+            }
+        }
+
         public static string ToDescription(this ModuleType module)
         {
             switch (module)
@@ -107,7 +135,7 @@ namespace Tool.ModularHouseBuilder
                     return "Roof";
 
                 default:
-                    return "<ERROR WHILE GETTING ASSET DESCRIPTION>";
+                    return "<ERROR WHILE GETTING DESCRIPTION>";
             }
         }
 
