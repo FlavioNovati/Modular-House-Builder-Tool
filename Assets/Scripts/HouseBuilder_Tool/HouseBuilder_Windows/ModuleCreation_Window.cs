@@ -95,7 +95,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             //Name of the Module
             GUILayout.Space(5f);
-            GUILayout.Label("Module Name");
+            GUILayout.Label("Module BuildingName");
             _moduleName = GUILayout.TextField(_moduleName, GUILayout.ExpandWidth(true));
             if (!string.IsNullOrEmpty(_moduleName))
                 _moduleName = _moduleName.Replace(' ', '_');
@@ -249,8 +249,8 @@ namespace Tool.ModularHouseBuilder.SubTool
         {
             //Instanciate Scriptable
             ModuleData module_Data = ScriptableObject.CreateInstance<ModuleData>();
-            GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(prefabAssetPath, typeof(GameObject));
-            module_Data.Prefab = prefab;
+            HouseBuilderModule modulePrefab = (HouseBuilderModule)AssetDatabase.LoadAssetAtPath(prefabAssetPath, typeof(HouseBuilderModule));
+            module_Data.Module = modulePrefab;
             
             //Get Path
             string moduleDataPath = $"{saveFolderPath}/{SCRIPTABLE_PREFIX}{name}.asset";
@@ -262,17 +262,17 @@ namespace Tool.ModularHouseBuilder.SubTool
             module_Data.CenterOffset = centerOffset;
             module_Data.Rotation = _meshRotation;
             module_Data.PrefabAssetPath = prefabAssetPath;
-            module_Data.Preview = AssetPreview.GetMiniThumbnail(prefab);
+            module_Data.Preview = AssetPreview.GetMiniThumbnail(modulePrefab);
             module_Data.ModuleName = _moduleName;
 
             //Create Asset
             AssetDatabase.CreateAsset(module_Data, moduleDataPath);
 
             //Link Data
-            module_Data.Prefab.GetComponent<HouseBuilderModule>().ModuleData = module_Data;
+            module_Data.Module.GetComponent<HouseBuilderModule>().ModuleData = module_Data;
 
             //Update Prefab
-            PrefabUtility.SavePrefabAsset(prefab);
+            PrefabUtility.SavePrefabAsset(modulePrefab.gameObject);
         }
 
         private string GetAssetFolderPath(ModuleType moduleType) => $"{_prefabFolderPath}/{PREFAB_FOLDER_NAME}/{moduleType.ToFolderName()}";

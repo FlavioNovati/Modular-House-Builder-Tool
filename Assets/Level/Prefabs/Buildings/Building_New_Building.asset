@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7da6e765ee05724da8ce7fa64ea4d2e, type: 3}
   m_Name: Building_New_Building
   m_EditorClassIdentifier: 
-  Name: New_Building
+  BuildingName: New_Building
   Description: New Building
   BuildingPath: Assets/Level/Prefabs/Buildings/Building_New_Building.prefab
-  Building: {fileID: 21367782199930810, guid: 05c03657e84e69f47846a7be8adca76c, type: 3}
+  Building: {fileID: 6572047269026564245, guid: 05c03657e84e69f47846a7be8adca76c, type: 3}
   Preview: {fileID: 0}
   ModulesInBuilding: 0

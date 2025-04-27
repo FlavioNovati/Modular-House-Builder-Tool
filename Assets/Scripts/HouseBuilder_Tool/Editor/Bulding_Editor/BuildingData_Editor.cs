@@ -62,7 +62,7 @@ namespace Tool.ModularHouseBuilder
 
         private void ShowNameAndDescrition()
         {
-            GUILayout.Label(_buildingData.Name, _buildingNameStyle);
+            GUILayout.Label(_buildingData.BuildingName, _buildingNameStyle);
             GUILayout.Space(5f);
             GUILayout.Label(_buildingData.Description, GUILayout.ExpandWidth(true));
             GUILayout.Space(5f);

@@ -17,21 +17,28 @@ namespace Tool.ModularHouseBuilder.SubTool
         public event WindowActionCallback OnWindowClosed;
         public event WindowActionCallback OnWindowDestroyed;
 
-        public ModulesExplorer_Window(Type dockNextTo)
+        public static ModulesExplorer_Window OpenWindow() => OpenWindow(null);
+        public static ModulesExplorer_Window OpenWindow(Type dockType)
         {
             string artAssetPath = EditorPrefs.GetString("ModularHouseBuilder_ART_FOLDER");
-            
+
             //Get Icon Asset
             Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{artAssetPath}SearchIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Module Explorer", windowIcon, "Tool to edit modules");
 
-            //Create Window
-            ModulesExplorer_Window window = GetWindow<ModulesExplorer_Window>("", true, dockNextTo);
-            //Assign Fancy Graphics
+            ModulesExplorer_Window window;
+
+            if(dockType != null)
+                window = GetWindow<ModulesExplorer_Window>(dockType);
+            else
+                window = GetWindow<ModulesExplorer_Window>();
+
             window.titleContent = titleContent;
             window.name = "Module Explorer";
+
+            return window;
         }
-        
+
         private ModuleData SelectedModuleProperty
         {
             get => _selectedModule;
@@ -72,8 +79,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private void OnEnable()
         {
-            if (string.IsNullOrEmpty(_assetsPath))
-                _assetsPath = EditorPrefs.GetString("ModularHouseBuilder_MODULES_FOLDER");
+            _assetsPath = EditorPrefs.GetString("ModularHouseBuilder_MODULES_FOLDER");
 
             //SET UP TABS
             _selectedTab = 0;
@@ -150,7 +156,7 @@ namespace Tool.ModularHouseBuilder.SubTool
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter
             };
-            _moduleNameStyle.normal.textColor = Color.white;
+            _moduleNameStyle.normal.textColor = Color.white;     
 
             Repaint();
         }
@@ -171,9 +177,12 @@ namespace Tool.ModularHouseBuilder.SubTool
             if(currentTab != _selectedTab)
                 SelectedModuleProperty = null;
 
-            Rect windowRect = position;
-            
-            if (SelectedModuleProperty == null && _showModuleInfo)
+            //Draw Tab Or Selected Module Property
+            if (_showModuleInfo && SelectedModuleProperty != null)
+            {
+                DrawModule(SelectedModuleProperty);
+            }
+            else
             {
                 ExplorerTabData tab = _explorerTabs[_selectedTab];
 
@@ -181,22 +190,10 @@ namespace Tool.ModularHouseBuilder.SubTool
                 if (GUILayout.Button("Update All Preview", GUILayout.ExpandWidth(true)))
                     UpdateAllPreviews(tab.ModulesData);
 
-                //Search Bar
-                GUILayout.Space(15f);
-                GUILayout.Label("Search", GUILayout.ExpandWidth(true));
-                _searchInput = GUILayout.TextField(_searchInput, _searchGUIOptions);
-                GUILayout.Space(15f);
-
-
-                //Draw Label For Tab Name
-                GUILayout.Label(tab.Name, tab.GUIStyle);
-                
-                DrawModules(tab.ModulesData);
+                DrawResearchBar();
+                DrawTab(tab);
             }
-            else if(SelectedModuleProperty != null)
-            {
-                DrawModule(SelectedModuleProperty);
-            }
+
 
             //Input Handling
             Event currentEvent = Event.current;
@@ -211,6 +208,22 @@ namespace Tool.ModularHouseBuilder.SubTool
             }
         }
 
+        private void DrawResearchBar()
+        {
+            //Search Bar
+            GUILayout.Space(15f);
+            GUILayout.Label("Search", GUILayout.ExpandWidth(true));
+            _searchInput = GUILayout.TextField(_searchInput, _searchGUIOptions);
+            GUILayout.Space(15f);
+        }
+
+        private void DrawTab(ExplorerTabData tab)
+        {
+            //Draw Label For Tab Name
+            GUILayout.Label(tab.Name, tab.GUIStyle);
+            DrawModules(tab.ModulesData);
+        }
+
         private void DrawModule(ModuleData moduleData)
         {
             GUILayout.Label(moduleData.ModuleName, _moduleNameStyle);
@@ -219,10 +232,16 @@ namespace Tool.ModularHouseBuilder.SubTool
             GUILayout.Space(15f);
             using (new GUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("OpenWindow Prefab"))
+                if (GUILayout.Button("OpenWindow Module"))
                 {
-                    string prefabPath = AssetDatabase.GetAssetPath(moduleData.Prefab);
+                    string prefabPath = AssetDatabase.GetAssetPath(moduleData.Module.gameObject);
                     PrefabStageUtility.OpenPrefab(prefabPath);
+
+                    //Focus Insoector tab
+                    Type inspectorType = typeof(Editor).Assembly.GetType("UnityEditor.InspectorWindow");
+                    // Focus on the Inspector tab
+                    EditorWindow.GetWindow(inspectorType).Focus();
+
                 }
                 if (GUILayout.Button("Back"))
                     SelectedModuleProperty = null;
@@ -244,7 +263,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             //Apply search Filter
             if (!string.IsNullOrEmpty(_searchInput))
-                modulesToShow.AddRange(moduleDatas.Where(data => data.name.ToLower().Contains(_searchInput.ToLower())));
+                modulesToShow.AddRange(moduleDatas.Where(data => data.ModuleName.ToLower().Contains(_searchInput.ToLower())));
             else
                 modulesToShow.AddRange(moduleDatas);
             
@@ -263,7 +282,7 @@ namespace Tool.ModularHouseBuilder.SubTool
                             //Draw All modules on a row
                             for (int i = 0; i < modulesPerRow && currentIndex < modulesToShow.Count; i++, currentIndex = modulesPerRow * currentRow + i)
                             {
-                                if(GUILayout.Button(GetTexture(modulesToShow[currentIndex]), GUILayout.ExpandWidth(true)))
+                                if (GUILayout.Button(GetTexture(modulesToShow[currentIndex]), GUILayout.ExpandWidth(true)))
                                     SelectedModuleProperty = modulesToShow[currentIndex];
                             }
                         }
@@ -276,12 +295,12 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private Texture GetTexture(ModuleData moduleData)
         {
-            GameObject gameObject = moduleData.Prefab;
+            HouseBuilderModule modulePrefab = moduleData.Module;
             Texture preview = moduleData.Preview;
 
             if(preview == null)
             {
-                preview = AssetPreview.GetAssetPreview(gameObject);
+                preview = AssetPreview.GetAssetPreview(modulePrefab);
                 moduleData.Preview = preview;
             }
 
@@ -292,7 +311,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         {
             foreach(ModuleData moduleData in modules)
             {
-                Texture texture = AssetPreview.GetAssetPreview(moduleData.Prefab);
+                Texture texture = AssetPreview.GetAssetPreview(moduleData.Module);
                 moduleData.Preview = texture;
 
                 EditorUtility.SetDirty(moduleData);

@@ -8,7 +8,7 @@ namespace Tool.ModularHouseBuilder
 {
     public class BuildingData : ScriptableObject
     {
-        public string Name;
+        public string BuildingName;
         public string Description;
         public string BuildingPath;
         public Building Building;
@@ -19,7 +19,7 @@ namespace Tool.ModularHouseBuilder
 
         public BuildingData()
         {
-            Name = string.Empty;
+            BuildingName = string.Empty;
             Description = string.Empty;
             BuildingPath = string.Empty;
 

@@ -249,7 +249,7 @@ namespace Tool.ModularHouseBuilder
             GUILayout.Space(5f);
             if(GUILayout.Button("Update Preview", GUILayout.ExpandWidth(true)))
             {
-                _module.ModuleData.Preview = AssetPreview.GetAssetPreview(_module.ModuleData.Prefab);
+                _module.ModuleData.Preview = AssetPreview.GetAssetPreview(_module.ModuleData.Module);
                 EditorUtility.SetDirty(_module.ModuleData);
             }
         }

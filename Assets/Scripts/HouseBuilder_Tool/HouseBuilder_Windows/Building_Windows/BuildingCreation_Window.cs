@@ -53,7 +53,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         private void OnGUI()
         {
             //Building Name
-            GUILayout.Label("Name");
+            GUILayout.Label("BuildingName");
             string newName = GUILayout.TextField(_buildingName, GUILayout.ExpandWidth(true));
             if(newName != _buildingName)
                 _buildingName = _buildingName.Replace(' ', '_');
@@ -120,7 +120,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             //Create Scriptable
             BuildingData buildingData = ScriptableObject.CreateInstance<BuildingData>();
-            buildingData.Name = _buildingName;
+            buildingData.BuildingName = _buildingName;
             buildingData.Description = _buildingDescription;
             buildingData.BuildingPath = buildingPath;
 

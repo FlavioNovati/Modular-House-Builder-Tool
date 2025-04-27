@@ -138,29 +138,29 @@ namespace Tool.ModularHouseBuilder
                     return "<ERROR WHILE GETTING DESCRIPTION>";
             }
         }
-
+        
         public static Color ToColor(this ModuleType module)
         {
             switch (module)
             {
                 case ModuleType.WALL:
-                    return Color.white;
+                    return new Color(1, 1, 0.56f, 1);
                 case ModuleType.FLOOR:
-                    return Color.white;
+                    return new Color(1, 0.56f, 0.56f, 1);
                 case ModuleType.FLOOR_DECORATOR:
-                    return Color.white;
+                    return new Color(0.58f, 1, 0.56f, 1);
                 case ModuleType.WALL_DECORATOR:
-                    return Color.white;
+                    return new Color(0.56f, 0.98f, 1, 1);
                 case ModuleType.DOOR:
-                    return Color.white;
+                    return new Color(0.62f, 0.56f, 1, 1);
                 case ModuleType.DOOR_FRAME:
-                    return Color.white;
+                    return new Color(0.32f, 0.31f, 0.57f, 1);
                 case ModuleType.WINDOW:
-                    return Color.white;
+                    return new Color(1, 0.56f, 0.89f, 1);
                 case ModuleType.WINDOW_FRAME:
-                    return Color.white;
+                    return new Color(0.68f, 0.31f, 0.56f, 1);
                 case ModuleType.ROOF:
-                    return Color.white;
+                    return new Color(0.74f, 1, 0.85f, 1);
 
                 default:
                     return Color.red;

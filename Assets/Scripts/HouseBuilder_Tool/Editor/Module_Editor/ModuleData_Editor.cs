@@ -50,9 +50,9 @@ namespace Tool.ModularHouseBuilder
                 GUILayout.Label("NO PREVIEW AVAILABLE");
 
             //Open Prefab Button
-            if (GUILayout.Button("OpenWindow Prefab", GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("OpenWindow Module", GUILayout.ExpandWidth(true)))
             {
-                string prefabPath = AssetDatabase.GetAssetPath(_moduleData.Prefab);
+                string prefabPath = AssetDatabase.GetAssetPath(_moduleData.Module);
                 PrefabStageUtility.OpenPrefab(prefabPath);
             }
         }
