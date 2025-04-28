@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -30,6 +32,8 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private Pose _modulePose;
 
+        private List<HouseBuilderModule> _modulesInBuilding;
+
         private void OnEnable()
         {
             if (_moduleExplorer == null)
@@ -53,20 +57,21 @@ namespace Tool.ModularHouseBuilder.SubTool
             _building = prefabStage.prefabContentsRoot.GetComponent<Building>();
             _buildingData = _building.BuildingData;
 
+            _modulesInBuilding = new List<HouseBuilderModule>();
+            _modulesInBuilding.AddRange(_building.GetComponentsInChildren<HouseBuilderModule>());
+
             //Load materials
             LoadPreviewMaterial();
 
             _modulePose = new Pose(Vector3.zero, Quaternion.identity);
 
             SceneView.duringSceneGui += OnSceneGUI;
-            Undo.undoRedoPerformed += OnUndoRedoPerformed;
         }
 
         private void OnDisable()
         {
             _moduleExplorer.OnModuleSelected -= UpdateSelectedModule;
             SceneView.duringSceneGui -= OnSceneGUI;
-            Undo.undoRedoPerformed -= OnUndoRedoPerformed;
         }
 
 
@@ -187,21 +192,20 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private void InstanciateModule(ModuleData moduleData)
         {
+            Undo.RecordObject(_building, "Building Edited");
+
             HouseBuilderModule module = Instantiate<HouseBuilderModule>(moduleData.Module, _building.transform);
+            //Record Object Creation
+            Undo.RegisterCreatedObjectUndo(module, $"Module {moduleData.ModuleName} created");
+
+            //Adjust module position
             module.transform.position = _modulePose.position;
             module.transform.rotation = _modulePose.rotation;
 
+            //Add Module To Building Data
             _buildingData.AddModule(moduleData);
 
-            Undo.RegisterCreatedObjectUndo(module, "Instanciated "+moduleData.ModuleName);
-            Undo.RecordObject(module, "");
-            Undo.RecordObject(_building, "Edited Building");
             Undo.FlushUndoRecordObjects();
-        }
-
-        private void OnUndoRedoPerformed()
-        {
-
         }
 
         //Buttons in scene
