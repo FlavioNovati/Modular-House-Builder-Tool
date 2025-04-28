@@ -15,6 +15,6 @@ MonoBehaviour:
   BuildingName: New_Building
   Description: New Building
   BuildingPath: Assets/Level/Prefabs/Buildings/Building_New_Building.prefab
-  Building: {fileID: 6572047269026564245, guid: 05c03657e84e69f47846a7be8adca76c, type: 3}
+  Building: {fileID: 2875807080553814200, guid: 05c03657e84e69f47846a7be8adca76c, type: 3}
   Preview: {fileID: 0}
   ModulesInBuilding: 0

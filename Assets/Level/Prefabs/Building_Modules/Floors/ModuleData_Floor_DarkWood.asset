@@ -19,4 +19,4 @@ MonoBehaviour:
   PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Floors/Module_Floor_DarkWood.prefab
   ModuleName: DarkWood
   ModuleType: 2
-  Preview: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+  Preview: {fileID: 0}

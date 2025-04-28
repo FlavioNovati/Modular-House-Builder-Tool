@@ -46,6 +46,8 @@ namespace Tool.ModularHouseBuilder.SubTool
             if (prefabStage == null)
             {
                 Debug.LogError("ERROR - Not in prefab mode");
+                this.Close();
+                _moduleExplorer?.Close();
                 return;
             }
             _building = prefabStage.prefabContentsRoot.GetComponent<Building>();
@@ -57,12 +59,14 @@ namespace Tool.ModularHouseBuilder.SubTool
             _modulePose = new Pose(Vector3.zero, Quaternion.identity);
 
             SceneView.duringSceneGui += OnSceneGUI;
+            Undo.undoRedoPerformed += OnUndoRedoPerformed;
         }
 
         private void OnDisable()
         {
             _moduleExplorer.OnModuleSelected -= UpdateSelectedModule;
             SceneView.duringSceneGui -= OnSceneGUI;
+            Undo.undoRedoPerformed -= OnUndoRedoPerformed;
         }
 
 
@@ -132,7 +136,15 @@ namespace Tool.ModularHouseBuilder.SubTool
 
 
             if(Event.current.type == EventType.MouseDown && Event.current.button == 0)
+            {
                 InstanciateModule(_selectedModuleData);
+                Event.current.Use();
+            }
+
+            if(Input.GetKey(KeyCode.Escape) && _selectedModuleData != null)
+            {
+                _selectedModuleData = null;
+            }
 
             //Overlap Box
             //Show Near Modules
@@ -180,8 +192,17 @@ namespace Tool.ModularHouseBuilder.SubTool
             module.transform.rotation = _modulePose.rotation;
 
             _buildingData.AddModule(moduleData);
+
+            Undo.RegisterCreatedObjectUndo(module, "Instanciated "+moduleData.ModuleName);
+            Undo.RecordObject(module, "");
+            Undo.RecordObject(_building, "Edited Building");
+            Undo.FlushUndoRecordObjects();
         }
 
+        private void OnUndoRedoPerformed()
+        {
+
+        }
 
         //Buttons in scene
         //Save asset -> Save asset popup window
