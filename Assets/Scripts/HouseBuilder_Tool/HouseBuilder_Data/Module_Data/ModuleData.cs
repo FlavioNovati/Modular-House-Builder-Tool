@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace Tool.ModularHouseBuilder
@@ -19,6 +20,6 @@ namespace Tool.ModularHouseBuilder
         public Vector3 GetSnappingPos(Vector3 pos)
         {
             return Vector3.zero;
-        }
+        }        
     }
 }

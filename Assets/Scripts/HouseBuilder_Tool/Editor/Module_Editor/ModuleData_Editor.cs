@@ -47,7 +47,7 @@ namespace Tool.ModularHouseBuilder
                 GUILayout.Label(textureContent, textureOptions);
             }
             else
-                GUILayout.Label("NO PREVIEW AVAILABLE");
+                _moduleData.Preview = AssetPreview.GetAssetPreview(_moduleData.Module.gameObject);
 
             //Open Prefab Button
             if (GUILayout.Button("OpenWindow Module", GUILayout.ExpandWidth(true)))

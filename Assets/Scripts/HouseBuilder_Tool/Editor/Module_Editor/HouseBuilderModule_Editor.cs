@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using Unity.VisualScripting;
 
 namespace Tool.ModularHouseBuilder
 {
@@ -245,13 +244,6 @@ namespace Tool.ModularHouseBuilder
 
             if (GUILayout.Button("Reset Extension", GUILayout.ExpandWidth(true)))
                 ResetExtension();
-            
-            GUILayout.Space(5f);
-            if(GUILayout.Button("Update Preview", GUILayout.ExpandWidth(true)))
-            {
-                _module.ModuleData.Preview = AssetPreview.GetAssetPreview(_module.ModuleData.Module);
-                EditorUtility.SetDirty(_module.ModuleData);
-            }
         }
 
         private void UpdateCollider()

@@ -311,7 +311,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         {
             foreach(ModuleData moduleData in modules)
             {
-                Texture texture = AssetPreview.GetAssetPreview(moduleData.Module);
+                Texture texture = AssetPreview.GetAssetPreview(moduleData.Module.gameObject);
                 moduleData.Preview = texture;
 
                 EditorUtility.SetDirty(moduleData);

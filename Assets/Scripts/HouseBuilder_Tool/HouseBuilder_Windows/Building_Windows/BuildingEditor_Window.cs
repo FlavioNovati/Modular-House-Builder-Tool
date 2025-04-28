@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -47,13 +47,6 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             //Get Building
             PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
-            if (prefabStage == null)
-            {
-                Debug.LogError("ERROR - Not in prefab mode");
-                this.Close();
-                _moduleExplorer?.Close();
-                return;
-            }
             _building = prefabStage.prefabContentsRoot.GetComponent<Building>();
             _buildingData = _building.BuildingData;
 
@@ -74,6 +67,22 @@ namespace Tool.ModularHouseBuilder.SubTool
             SceneView.duringSceneGui -= OnSceneGUI;
         }
 
+        private void OnFocus()
+        {
+            if (_building != null)
+                return;
+
+            PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+
+            if (prefabStage == null)
+                return;
+
+            _building = prefabStage.prefabContentsRoot.GetComponent<Building>();
+            _buildingData = _building.BuildingData;
+
+            _modulesInBuilding = new List<HouseBuilderModule>();
+            _modulesInBuilding.AddRange(_building.GetComponentsInChildren<HouseBuilderModule>());
+        }
 
         private void LoadPreviewMaterial()
         {
@@ -95,6 +104,15 @@ namespace Tool.ModularHouseBuilder.SubTool
         //----------------------------------TOOL SCENE VIEW------------------------------------------------------------
         private void OnSceneGUI(SceneView sceneView)
         {
+            PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            if(prefabStage == null)
+                return;
+
+            //Check if tool is allowed
+            if (prefabStage.prefabContentsRoot.gameObject != _building.gameObject)
+                return;
+
+            //Do all only if an object is selected
             if (_selectedModuleData == null)
                 return;
 
@@ -142,11 +160,11 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             if(Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
-                InstanciateModule(_selectedModuleData);
+                InstantiateModule(_selectedModuleData);
                 Event.current.Use();
             }
 
-            if(Input.GetKey(KeyCode.Escape) && _selectedModuleData != null)
+            if(Event.current.keyCode == KeyCode.Escape && _selectedModuleData != null)
             {
                 _selectedModuleData = null;
             }
@@ -190,13 +208,15 @@ namespace Tool.ModularHouseBuilder.SubTool
         }
 
 
-        private void InstanciateModule(ModuleData moduleData)
+        private void InstantiateModule(ModuleData moduleData)
         {
             Undo.RecordObject(_building, "Building Edited");
 
-            HouseBuilderModule module = Instantiate<HouseBuilderModule>(moduleData.Module, _building.transform);
+            HouseBuilderModule module = PrefabUtility.InstantiatePrefab(moduleData.Module).GetComponent<HouseBuilderModule>();
+            module.transform.parent = _building.transform;
+
             //Record Object Creation
-            Undo.RegisterCreatedObjectUndo(module, $"Module {moduleData.ModuleName} created");
+            Undo.RegisterCreatedObjectUndo(module.gameObject, $"Module {moduleData.ModuleName} created");
 
             //Adjust module position
             module.transform.position = _modulePose.position;
@@ -204,6 +224,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             //Add Module To Building Data
             _buildingData.AddModule(moduleData);
+            EditorUtility.SetDirty(_buildingData);
 
             Undo.FlushUndoRecordObjects();
         }

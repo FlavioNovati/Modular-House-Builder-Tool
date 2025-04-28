@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7da09350c191f84889edcbf07a15c2d, type: 3}
-  m_Name: ModuleData_Wall_Balcony_1
+  m_Name: ModuleData_Wall_hdadadad
   m_EditorClassIdentifier: 
-  Module: {fileID: 2416777441823812067, guid: f9eac7fa3546a5943b586cb04cae2904, type: 3}
-  Extension: {x: 2, y: 1.2298869, z: 0.20628308}
-  Rotation: {x: -90, y: 0, z: 0}
-  CenterOffset: {x: 0, y: 0.61494327, z: 0}
-  PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Walls/Module_Wall_Balcony_1.prefab
-  ModuleName: Balcony_1
+  Module: {fileID: 7681044662314909468, guid: e811c0aca7d74444eaf36e8e483539e0, type: 3}
+  Extension: {x: 0.0029045502, y: 0.0033117773, z: 0.03}
+  Rotation: {x: 0, y: 0, z: 0}
+  CenterOffset: {x: 0, y: 0, z: 0}
+  PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Walls/Module_Wall_hdadadad.prefab
+  ModuleName: hdadadad
   ModuleType: 0
   Preview: {fileID: 0}
