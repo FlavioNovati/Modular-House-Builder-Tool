@@ -50,9 +50,9 @@ namespace Tool.ModularHouseBuilder
 
             if (GUILayout.Button("Open in Building Editor", GUILayout.ExpandWidth(true))) //Enter Prefab Mode
             {
-                PrefabStageUtility.OpenPrefab(_buildingData.BuildingPath);
+                //PrefabStageUtility.OpenPrefab(_buildingData.BuildingPath);
                 //Open Editor Window
-                BuildingEditor_Window.OpenWindow();
+                BuildingEditor_Window.OpenWindow(_buildingData.Building);
             }
 
             //Modules Count

@@ -7,21 +7,42 @@ using UnityEditor.SceneManagement;
 
 using UnityEngine;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
+using UnityEditor.TerrainTools;
 
 namespace Tool.ModularHouseBuilder.SubTool
 {
     public class BuildingEditor_Window : EditorWindow
     {
-        public static void OpenWindow()
+        private static BuildingEditor_Window Instance = null;
+        private static Building s_BuildingToEdit = null;
+        private static bool s_UpdateScenes = false;
+
+        public static void OpenWindow(Building buildingToEdit)
         {
+            //Update Data To Edit
+            s_BuildingToEdit = buildingToEdit;
+
+            //Check if window is already opened
+            if(Instance != null)
+            {
+                s_UpdateScenes = false;
+                return;
+            }
+            else
+                s_UpdateScenes = true;
+
+            //Create Window Params
             string artFolderPath = EditorPrefs.GetString("ModularHouseBuilder_ART_FOLDER");
 
             //Get Icon Asset
             Texture windowIcon = (Texture)AssetDatabase.LoadAssetAtPath($"{artFolderPath}BuildingEditIcon.png", typeof(Texture));
             GUIContent titleContent = new GUIContent("Building Editor", windowIcon, "Tool to edit buildings");
 
+            //Open Window -> Invokes OnEnable
             BuildingEditor_Window window = GetWindow<BuildingEditor_Window>();
             window.titleContent = titleContent;
+            Instance = window;
         }
 
         private ModulesExplorer_Window _moduleExplorer;
@@ -36,13 +57,25 @@ namespace Tool.ModularHouseBuilder.SubTool
         private Pose _modulePose;
         private float _overlapSizeMultiplier;
 
-        #region ------------ SETUP ROUTINE -------------------------------
+        private Scene _tempBuildingScene;
+        private Scene[] _enteringScenes;
+        private Scene _enteringActiveScene;
+
+        private bool _allowOverlap = false;
+
+        #region ------------ UNITY RUNTIME -------------------------------
         private void OnEnable()
         {
-            //Get Building
-            PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
-            if (prefabStage == null)
-                return;
+            _building = s_BuildingToEdit;
+            _buildingData = s_BuildingToEdit.BuildingData;
+
+            if (s_UpdateScenes)
+                UpdateOpenedScenes();
+
+            OpenTemporaryScene();
+            
+            SceneView.duringSceneGui += OnSceneGUI;
+            Application.quitting += OnApplicationQuit;
 
             if (_moduleExplorer == null)
             {
@@ -53,88 +86,107 @@ namespace Tool.ModularHouseBuilder.SubTool
             _moduleExplorer.OnModuleSelected += UpdateSelectedModule;
             _moduleExplorer.OnWindowDestroyed += Close;
 
-            //Get Building
-            if (prefabStage == null)
-                return;
-
-            _building = prefabStage.prefabContentsRoot.GetComponent<Building>();
-
-            if(_building == null)
-                return;
-
-            _buildingData = _building.BuildingData;
-            UpdateBuildingData();
-
             //Load materials
             LoadPreviewMaterial();
 
             _modulePose = new Pose(Vector3.zero, Quaternion.identity);
             _overlapSizeMultiplier = 0.25f;
-
-            SceneView.duringSceneGui += OnSceneGUI;
         }
 
         private void OnDisable()
         {
-            _moduleExplorer.OnModuleSelected -= UpdateSelectedModule;
             SceneView.duringSceneGui -= OnSceneGUI;
+            _moduleExplorer.OnModuleSelected -= UpdateSelectedModule;
         }
 
-        private void OnFocus()
+        private void OnDestroy()
         {
-            if (_building != null)
-                return;
+            Instance = null;
+            s_BuildingToEdit = null;
+            s_UpdateScenes = true;
 
-            PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            OpenPreviousScenes();
+        }
 
-            if (prefabStage == null)
-                return;
+        //Before Quitting Open last scenes
+        private void OnApplicationQuit() => OpenPreviousScenes();
+        #endregion
 
-            _building = prefabStage.prefabContentsRoot.GetComponent<Building>();
-            _buildingData = _building.BuildingData;
+        #region ------------ SCENE MANAGEMENT -------------------------------
+        //Since editor is in a temporary scene that will be closed -> Save previous scenes
+        private void UpdateOpenedScenes()
+        {
+            //Get Active Scene
+            _enteringActiveScene = SceneManager.GetActiveScene();
 
-            UpdateBuildingData();
+            //Get all scenes
+            int scenesOpenedCount = SceneManager.sceneCount;
+            _enteringScenes = new Scene[scenesOpenedCount];
+            for (int i = 0; i < scenesOpenedCount; i++)
+                _enteringScenes[i] = SceneManager.GetSceneAt(i);
+        }
+
+        private void OpenPreviousScenes()
+        {
+            CleanScene();
+
+            //Load All Scenes
+            foreach (Scene scene in _enteringScenes)
+                EditorSceneManager.OpenScene(scene.name, OpenSceneMode.Additive);
+            //Set Active Scene
+            SceneManager.SetActiveScene(_enteringActiveScene);
+
+            //Close temp scene
+            EditorSceneManager.CloseScene(_tempBuildingScene, true);
+        }
+
+        private void OpenTemporaryScene()
+        {
+            _tempBuildingScene = EditorSceneManager.OpenScene("Assets/Scripts/HouseBuilder_Tool/TempScene.unity", OpenSceneMode.Single);
+            SceneManager.SetActiveScene(_tempBuildingScene);
+
+            //Instanciate Prefab
+            _building = (Building)PrefabUtility.InstantiatePrefab(_building, _tempBuildingScene);
+        }
+
+        private void CleanScene()
+        {
+            //Remove All Game objects
+            GameObject[] roots = _tempBuildingScene.GetRootGameObjects();
+            foreach(GameObject root in roots)
+                DestroyImmediate(root);
+
+            //Save Scene
+            EditorSceneManager.SaveOpenScenes();
         }
         #endregion
 
-
-        //Buttons in scene
-        //Save asset -> Save asset popup window
-        //Remove all scripts (Keep two saves)
-        //Delete asset -> Delete asset popo window
-
-        //Show Available assets
-
-        //Highlight modules
-
-        //Enter Prefab Mode
-        //Edit only on prefab mode
-
-        //Asset Preview in scene
-        //Show overlap box
-        //Show snappable moduless
-
-        //Show Saved Modules
-        //Show Unsaved Modules
-
+        #region ------------ TOOL LIFE CYCLE ------------------------------
         private void OnGUI()
         {
-            _overlapSizeMultiplier = EditorGUILayout.FloatField("Extents Multiplier", _overlapSizeMultiplier, GUILayout.ExpandWidth(true));
+            //Buttons in scene
+            //Remove all scripts (Keep two saves)
+            //Delete asset -> Delete asset popo window
 
-            if (GUILayout.Button("Update Building Data", GUILayout.ExpandWidth(true)))
-                UpdateBuildingData();
+            _overlapSizeMultiplier = EditorGUILayout.FloatField("Extents Multiplier", _overlapSizeMultiplier, GUILayout.ExpandWidth(true));
+            
+            GUILayout.Space(10f);
+            if(GUILayout.Button("Save Building"))
+                SaveBuilding();
+
+            GUILayout.Space(10f);
+            _allowOverlap = GUILayout.Toggle(_allowOverlap, "Allow Overlap: ");
         }
 
-        #region ------------ SCENE GUI METHODS -----------------------------
         private void OnSceneGUI(SceneView sceneView)
         {
-            PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
-            if(prefabStage == null)
-                return;
+            //Highlight modules
+            //Asset Preview in scene
+            //Show overlap box
+            //Show snappable moduless
 
-            //Check if tool is allowed
-            if (prefabStage.prefabContentsRoot.gameObject != _building.gameObject)
-                return;
+            //Show Saved Modules
+            //Show Unsaved Modules
 
             //Do all only if an object is selected
             if (_selectedModuleData == null)
@@ -145,73 +197,130 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             //Get Scene Camera
             Camera sceneCamera = sceneView.camera;
-
-            //Get Collision Point With Plane
+            
+            //Get Point to place module to
             Plane worldPlane = new Plane(Vector3.up, Vector3.zero);
             Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+            if(Physics.Raycast(ray, out RaycastHit hitData))
+            {
+                _modulePose.position = hitData.point;
+            }
             //Raycast on World Plane
-            if (worldPlane.Raycast(ray, out float enter))
+            else if(worldPlane.Raycast(ray, out float enter))
             {
                 Vector3 collisionPoint = ray.GetPoint(enter);
-
                 //Update Module Position
                 _modulePose.position = collisionPoint;
+            }
 
-                //SHIFT + 
-                if (Event.current.shift)
+
+
+            //SHIFT + 
+            if (Event.current.shift)
+            {
+                //Rotate
+                if (Event.current.type == EventType.ScrollWheel)
                 {
-                    //Rotate
-                    if (Event.current.type == EventType.ScrollWheel)
-                    {
-                        float rotationAngles = Event.current.delta.x;
-                        _modulePose.rotation.eulerAngles += new Vector3(0f, rotationAngles, 0f);
-                        SnapRotation(5f);
-                    }
+                    float rotationAngles = Event.current.delta.x;
+                    _modulePose.rotation.eulerAngles += new Vector3(0f, rotationAngles, 0f);
+                    SnapRotation(5f);
                 }
+            }
 
-                //CONTROL + 
-                if (Event.current.control)
-                {
-                    //Snap Position
-                    SnapModuleToGrid();
-                }
+            //CONTROL + 
+            if (Event.current.control)
+            {
+                //Snap Position
+                SnapModuleToGrid();
+            }
 
-                //Overlap and ALL
-                Vector3 boxPosition = _modulePose.position;
-                boxPosition.y += _selectedModuleData.CenterPoint.y;
 
-                Quaternion boxRotation = _modulePose.rotation;
-                Vector3 boxExtention = _selectedModuleData.Extension;
-                
-                List<HouseModule> overlappingModules = new List<HouseModule>();
-                List<HouseModule> nearModules = new List<HouseModule>();
+            //CHECK COLLISIONS
+            Vector3 boxPosition = _modulePose.position;
+            boxPosition.y += _selectedModuleData.CenterPoint.y;
 
-                overlappingModules = OverlapBoxAtPoint(boxPosition, boxRotation, boxExtention);
-                
+            Quaternion boxRotation = _modulePose.rotation;
+            Vector3 boxExtention = _selectedModuleData.Extension;
+
+            List<HouseModule> overlappingModules = new List<HouseModule>();
+            List<HouseModule> nearModules = new List<HouseModule>();
+
+            //Get modules that are too close to selected module
+            DrawBox(boxPosition, boxRotation, boxExtention, 0f, Color.red);
+            overlappingModules = OverlapBoxAtPoint(boxPosition, boxRotation, boxExtention, -0.0005f);
+
+            //Analyze Collisions
+            if (overlappingModules.Count <= 0)
+            {
+                //Draw Overlap box with size multiplier
                 DrawBox(boxPosition, boxRotation, boxExtention, _overlapSizeMultiplier, Color.white);
 
+                //Get near Modules
+                nearModules = OverlapBoxAtPoint(boxPosition, boxRotation, boxExtention, _overlapSizeMultiplier);
 
-                //Show Preview
-                Material previewMaterial = overlappingModules.Count <= 0 ? _previewMaterial_A : _previewMaterial_N;
-                DrawModulePreviewAtPoint(_selectedModuleData, _modulePose, previewMaterial);
+                //If have module nearby try snap position
+                if (nearModules.Count > 0)
+                {
+                    //Snap
+                    //Draw Modules
+                }
 
-                //Repaint Scene View
-                SceneView.RepaintAll();
             }
 
+            //Show Preview
+            Material previewMaterial = overlappingModules.Count <= 0 ? _previewMaterial_A : _previewMaterial_N;
+            DrawModulePreviewAtPoint(_selectedModuleData, _modulePose, previewMaterial);
 
-            if(Event.current.type == EventType.MouseDown && Event.current.button == 0)
+            //Repaint Scene View
+            SceneView.RepaintAll();
+
+
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
-                InstantiateModule(_selectedModuleData);
-                Event.current.Use();
+                if(overlappingModules.Count <= 0 && !_allowOverlap)
+                {
+                    InstantiateModule(_selectedModuleData);
+                    Event.current.Use();
+                }
             }
 
-            if(Event.current.keyCode == KeyCode.Escape && _selectedModuleData != null)
+            if (Event.current.keyCode == KeyCode.Escape && _selectedModuleData != null)
             {
                 _selectedModuleData = null;
             }
         }
+        #endregion
 
+        #region------------ DATA UPDATE ----------------------------------
+        private void LoadPreviewMaterial()
+        {
+            string materialAssetPath = EditorPrefs.GetString("ModularHouseBuilder_ART_FOLDER");
+            string material_AcceptedName = "PreviewMaterial_A.mat";
+            string material_NegatedName = "PreviewMaterial_N.mat";
+
+            _previewMaterial_A = AssetDatabase.LoadAssetAtPath($"{materialAssetPath}{material_AcceptedName}", typeof(Material)) as Material;
+            _previewMaterial_N = AssetDatabase.LoadAssetAtPath($"{materialAssetPath}{material_NegatedName}", typeof(Material)) as Material;
+        }
+
+        private void UpdateSelectedModule(ModuleData moduleData) => _selectedModuleData = moduleData;
+        
+        private void SaveBuilding()
+        {
+            //Record Object
+            Undo.RecordObject(_building, "Building Saved");
+
+            //Update Prefab
+            Building buildingPrefab = _building;
+            PrefabUtility.SaveAsPrefabAsset(buildingPrefab.gameObject, _buildingData.BuildingPath);
+            PrefabUtility.RevertPrefabInstance(buildingPrefab.gameObject, InteractionMode.AutomatedAction);
+
+            //Save Scriptable
+            EditorUtility.SetDirty(_buildingData);
+            AssetDatabase.SaveAssetIfDirty(_buildingData);
+
+            Undo.FlushUndoRecordObjects();
+        }
+        #endregion
 
         private void SnapModuleToGrid()
         {
@@ -224,7 +333,6 @@ namespace Tool.ModularHouseBuilder.SubTool
             Vector3 roundedRotation = _modulePose.rotation.eulerAngles.Round(degrees);
             _modulePose.rotation.eulerAngles = roundedRotation;
         }
-
 
         private void InstantiateModule(ModuleData moduleData)
         {
@@ -247,33 +355,28 @@ namespace Tool.ModularHouseBuilder.SubTool
             Undo.FlushUndoRecordObjects();
         }
 
-
         private List<HouseModule> OverlapBoxAtPoint(Vector3 position, Quaternion rotation, Vector3 overlapExtents, float sizeMultiplier = 0f)
         {
-
-
             Collider[] overlapResult;
             List<HouseModule> modules = new List<HouseModule>();
 
             //Adjust overlap size
             overlapExtents += overlapExtents * sizeMultiplier;
 
-            DrawBox(position, rotation, overlapExtents, 0f, Color.red);
-
             //Get Colliding object
-            overlapResult = Physics.OverlapBox(position, overlapExtents, rotation);
+            overlapResult = Physics.OverlapBox(position, overlapExtents/2f, rotation);
 
             //Get Only House Modules
             foreach (Collider col in overlapResult)
             {
-                Debug.Log("- "+col.gameObject.name);
-                if(col.gameObject.TryGetComponent<HouseModule>(out HouseModule module))
+                if (col.gameObject.TryGetComponent<HouseModule>(out HouseModule module))
                     modules.Add(module);
             }
 
             return modules;
         }
 
+        #region ------------ DRAW METHODS -----------------------------
         private void DrawBox(Vector3 boxPosition, Quaternion boxRotation, Vector3 boxExtents, float sizeMultiplier, Color color)
         {
             boxExtents += boxExtents * sizeMultiplier;
@@ -287,15 +390,6 @@ namespace Tool.ModularHouseBuilder.SubTool
             Handles.DrawWireCube(Vector3.zero, boxExtents);
         }
 
-
-        private void DrawModulesOutlines(List<HouseModule> modules)
-        {
-            foreach(HouseModule module in modules)
-            {
-
-            }
-        }
-
         private void DrawModulePreviewAtPoint(ModuleData moduleToShow, Pose modulePose, Material previewMaterial)
         {
             HouseModule module = moduleToShow.Module;
@@ -307,32 +401,19 @@ namespace Tool.ModularHouseBuilder.SubTool
             {
                 Matrix4x4 childLocalMatrix = filter.transform.localToWorldMatrix;
                 Matrix4x4 childToWorldMatrix = positionToWorldMatrix * childLocalMatrix;
-                
+
                 previewMaterial.SetPass(0);
 
                 Graphics.DrawMeshNow(filter.sharedMesh, childToWorldMatrix);
             }
         }
 
-        #endregion
-
-        #region------------ DATA UPDATE ----------------------------------
-        private void LoadPreviewMaterial()
+        private void DrawModulesOutlines(List<HouseModule> modules)
         {
-            string materialAssetPath = EditorPrefs.GetString("ModularHouseBuilder_ART_FOLDER");
-            string material_AcceptedName = "PreviewMaterial_A.mat";
-            string material_NegatedName = "PreviewMaterial_N.mat";
+            foreach (HouseModule module in modules)
+            {
 
-            _previewMaterial_A = AssetDatabase.LoadAssetAtPath($"{materialAssetPath}{material_AcceptedName}", typeof(Material)) as Material;
-            _previewMaterial_N = AssetDatabase.LoadAssetAtPath($"{materialAssetPath}{material_NegatedName}", typeof(Material)) as Material;
-        }
-
-        private void UpdateSelectedModule(ModuleData moduleData) => _selectedModuleData = moduleData;
-
-        private void UpdateBuildingData()
-        {
-            //Update Modules in building
-            List<HouseModule> modulesInScene = _building.GetComponentsInChildren<HouseModule>().ToList();
+            }
         }
         #endregion
     }
