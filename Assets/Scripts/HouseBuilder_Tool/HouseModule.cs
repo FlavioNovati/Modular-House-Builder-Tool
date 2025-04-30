@@ -7,7 +7,7 @@ using UnityEditor.SceneManagement;
 
 namespace Tool.ModularHouseBuilder
 {
-    public class HouseBuilderModule : MonoBehaviour
+    public class HouseModule : MonoBehaviour
     {
         public ModuleData ModuleData;
         public ModuleType ModuleType => ModuleData.ModuleType;

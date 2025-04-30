@@ -295,7 +295,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
         private Texture GetTexture(ModuleData moduleData)
         {
-            HouseBuilderModule modulePrefab = moduleData.Module;
+            HouseModule modulePrefab = moduleData.Module;
             Texture preview = moduleData.Preview;
 
             if(preview == null)

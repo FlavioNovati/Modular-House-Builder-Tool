@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 
 namespace Tool.ModularHouseBuilder
 {
-    [CustomEditor(typeof(HouseBuilderModule))]
+    [CustomEditor(typeof(HouseModule))]
     public class HouseBuilderModule_Editor : Editor
     {
         const float HANDLE_SIZE = 0.25f;
@@ -15,7 +15,7 @@ namespace Tool.ModularHouseBuilder
         private Color _yAxisColor = Color.green;
         private Color _zAxisColor = Color.blue;
 
-        private HouseBuilderModule _module;
+        private HouseModule _module;
         private MeshFilter _meshFilter;
 
         private bool _useBoundsForCollisions = true;
@@ -34,7 +34,7 @@ namespace Tool.ModularHouseBuilder
 
         void OnEnable()
         {
-            _module = (HouseBuilderModule)target;
+            _module = (HouseModule)target;
             _meshFilter = _module.GetComponentInChildren<MeshFilter>();
         }
 

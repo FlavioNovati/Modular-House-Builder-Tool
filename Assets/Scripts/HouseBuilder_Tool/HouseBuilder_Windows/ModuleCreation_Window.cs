@@ -185,7 +185,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             //    Mesh (Actual Mesh)
 
             //Create Parent
-            GameObject prefab = new GameObject(name, typeof(HouseBuilderModule), typeof(BoxCollider));
+            GameObject prefab = new GameObject(name, typeof(HouseModule), typeof(BoxCollider));
 
             //Create Mesh Holder Child
             GameObject meshHolder = new GameObject("-MESH-");
@@ -249,7 +249,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         {
             //Instanciate Scriptable
             ModuleData module_Data = ScriptableObject.CreateInstance<ModuleData>();
-            HouseBuilderModule modulePrefab = (HouseBuilderModule)AssetDatabase.LoadAssetAtPath(prefabAssetPath, typeof(HouseBuilderModule));
+            HouseModule modulePrefab = (HouseModule)AssetDatabase.LoadAssetAtPath(prefabAssetPath, typeof(HouseModule));
             module_Data.Module = modulePrefab;
             
             //Get Path
@@ -269,7 +269,7 @@ namespace Tool.ModularHouseBuilder.SubTool
             AssetDatabase.CreateAsset(module_Data, moduleDataPath);
 
             //Link Data
-            module_Data.Module.GetComponent<HouseBuilderModule>().ModuleData = module_Data;
+            module_Data.Module.GetComponent<HouseModule>().ModuleData = module_Data;
 
             //Update Prefab
             PrefabUtility.SavePrefabAsset(modulePrefab.gameObject);
