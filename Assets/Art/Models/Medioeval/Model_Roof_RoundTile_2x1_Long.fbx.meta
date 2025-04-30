@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_RoundTiles
-    second: {fileID: 2100000, guid: b284917729cdef2408efd8cc0f0bc207, type: 2}
+    second: {fileID: 2100000, guid: 3590bba6095325641a34b54c125cc31b, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_WoodTrim
-    second: {fileID: 2100000, guid: 6b9261a49219c084fbf0ff52da39ee2c, type: 2}
+    second: {fileID: 2100000, guid: e5db89f55329377419674fe699f6870d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -98,7 +98,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.01
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

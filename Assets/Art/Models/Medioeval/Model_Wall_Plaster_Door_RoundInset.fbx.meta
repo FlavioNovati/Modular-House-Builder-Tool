@@ -13,12 +13,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_RockTrim
-    second: {fileID: 2100000, guid: 9bc6f269194c4aa418b4c715f9be7829, type: 2}
+    second: {fileID: 2100000, guid: 381e5d75cd648574c97cb504f24aa97d, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_WoodTrim
-    second: {fileID: 2100000, guid: 89e65c26e41737a4ca8b214aa1a64389, type: 2}
+    second: {fileID: 2100000, guid: e5db89f55329377419674fe699f6870d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -103,7 +103,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.01
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

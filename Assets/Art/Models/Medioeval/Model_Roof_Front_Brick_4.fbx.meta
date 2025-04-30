@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_Plaster
-    second: {fileID: 2100000, guid: 31fe9b6cc8c9b6645857d081ef3343d5, type: 2}
+    second: {fileID: 2100000, guid: 0656fa29e4709124d9bd65ef52b6dc48, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: MI_WoodTrim
-    second: {fileID: 2100000, guid: 549ce414161c02445a41f86ac74fc5c5, type: 2}
+    second: {fileID: 2100000, guid: e5db89f55329377419674fe699f6870d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -98,7 +98,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.01
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

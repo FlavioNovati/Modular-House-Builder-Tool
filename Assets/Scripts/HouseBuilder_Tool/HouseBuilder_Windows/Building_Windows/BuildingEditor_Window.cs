@@ -175,7 +175,7 @@ namespace Tool.ModularHouseBuilder.SubTool
                 SaveBuilding();
 
             GUILayout.Space(10f);
-            _allowOverlap = GUILayout.Toggle(_allowOverlap, "Allow Overlap: ");
+            _allowOverlap = GUILayout.Toggle(_allowOverlap, "Allow Overlap");
         }
 
         private void OnSceneGUI(SceneView sceneView)
@@ -257,9 +257,10 @@ namespace Tool.ModularHouseBuilder.SubTool
                 nearModules = OverlapBoxAtPoint(boxPosition, boxRotation, boxExtention, _overlapSizeMultiplier);
                 if(nearModules.Count > 0)
                 {
-                    //draw near modules
+                    //Draw near modules
+                    DrawModulesOutlines(nearModules);
 
-                    if(Event.current.control)
+                    if (Event.current.control)
                     {
                         //Snap
 
@@ -277,12 +278,11 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
-
+                //Instanciate module if allowed
                 if(overlappingModules.Count <= 0 || _allowOverlap)
-                {
                     InstantiateModule(_selectedModuleData);
-                    Event.current.Use();
-                }
+
+                Event.current.Use();
             }
 
             if (Event.current.keyCode == KeyCode.Escape && _selectedModuleData != null)
