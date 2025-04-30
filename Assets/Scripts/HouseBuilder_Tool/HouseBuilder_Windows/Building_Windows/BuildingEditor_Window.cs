@@ -213,8 +213,6 @@ namespace Tool.ModularHouseBuilder.SubTool
                 _modulePose.position = collisionPoint;
             }
 
-
-
             //SHIFT + 
             if (Event.current.shift)
             {
@@ -250,25 +248,27 @@ namespace Tool.ModularHouseBuilder.SubTool
             overlappingModules = OverlapBoxAtPoint(boxPosition, boxRotation, boxExtention, -0.0005f);
 
             //Analyze Collisions
-            if (overlappingModules.Count <= 0)
+            if (overlappingModules.Count <= 0 || _allowOverlap)
             {
                 //Draw Overlap box with size multiplier
                 DrawBox(boxPosition, boxRotation, boxExtention, _overlapSizeMultiplier, Color.white);
 
                 //Get near Modules
                 nearModules = OverlapBoxAtPoint(boxPosition, boxRotation, boxExtention, _overlapSizeMultiplier);
-
-                //If have module nearby try snap position
-                if (nearModules.Count > 0)
+                if(nearModules.Count > 0)
                 {
-                    //Snap
-                    //Draw Modules
-                }
+                    //draw near modules
 
+                    if(Event.current.control)
+                    {
+                        //Snap
+
+                    }
+                }
             }
 
             //Show Preview
-            Material previewMaterial = overlappingModules.Count <= 0 ? _previewMaterial_A : _previewMaterial_N;
+            Material previewMaterial = overlappingModules.Count <= 0 || _allowOverlap ? _previewMaterial_A : _previewMaterial_N;
             DrawModulePreviewAtPoint(_selectedModuleData, _modulePose, previewMaterial);
 
             //Repaint Scene View
@@ -277,7 +277,8 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
-                if(overlappingModules.Count <= 0 && !_allowOverlap)
+
+                if(overlappingModules.Count <= 0 || _allowOverlap)
                 {
                     InstantiateModule(_selectedModuleData);
                     Event.current.Use();
