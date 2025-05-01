@@ -15,7 +15,7 @@ MonoBehaviour:
   Module: {fileID: 339800672156929995, guid: 971277e39f22a8f4fb13c1d70c8d8020, type: 3}
   Extension: {x: 2, y: 3.1226883, z: 1.0924462}
   Rotation: {x: -90, y: 0, z: 0}
-  CenterOffset: {x: 0, y: 1.5613441, z: 0}
+  ColliderCenter: {x: 0, y: 1.5613441, z: 0}
   PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Door_Frames/Module_Door_Frame_Door_Insert.prefab
   ModuleName: Door_Insert
   ModuleType: 32

@@ -235,7 +235,7 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             //CHECK COLLISIONS
             Vector3 boxPosition = _modulePose.position;
-            boxPosition.y += _selectedModuleData.CenterPoint.y;
+            boxPosition.y += _selectedModuleData.ColliderCenter.y;
 
             Quaternion boxRotation = _modulePose.rotation;
             Vector3 boxExtention = _selectedModuleData.Extension;
@@ -264,7 +264,7 @@ namespace Tool.ModularHouseBuilder.SubTool
                     {
                         //Snap
                         HouseModule closestModule = GetClosestModule(nearModules);
-                        closestModule.ModuleData.GetLocalSnappingPos(_modulePose.position, _selectedModuleData.ModuleType);
+                        closestModule.ModuleData.GetLocalSnappingPosition(_modulePose.position, _selectedModuleData.ModuleType);
                     }
                 }
             }

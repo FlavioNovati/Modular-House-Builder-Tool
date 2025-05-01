@@ -259,11 +259,13 @@ namespace Tool.ModularHouseBuilder.SubTool
             //Create Scriptable Asset
             module_Data.ModuleType = _moduleType;
             module_Data.Extension = extension;
-            module_Data.CenterOffset = centerOffset;
+            module_Data.ColliderCenter = centerOffset;
             module_Data.Rotation = _meshRotation;
             module_Data.PrefabAssetPath = prefabAssetPath;
             module_Data.Preview = AssetPreview.GetMiniThumbnail(modulePrefab);
             module_Data.ModuleName = _moduleName;
+
+            module_Data.CreateSnappingPoints();
 
             //Create Asset
             AssetDatabase.CreateAsset(module_Data, moduleDataPath);

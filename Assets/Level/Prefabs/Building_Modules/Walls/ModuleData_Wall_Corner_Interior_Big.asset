@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: ModuleData_Wall_Corner_Interior_Big
   m_EditorClassIdentifier: 
   Module: {fileID: 736323135469228938, guid: 7857452a1ada0c140b177771a05282e8, type: 3}
-  Extension: {x: 0.33314267, y: 2.9999998, z: 0.36812487}
+  Extension: {x: 0.33314267, y: 3.0000007, z: 0.368125}
   Rotation: {x: -90, y: 0, z: 0}
-  CenterOffset: {x: 0, y: 1.4999999, z: 0}
+  ColliderCenter: {x: 0, y: 1.4999999, z: 0}
   PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Walls/Module_Wall_Corner_Interior_Big.prefab
   ModuleName: Corner_Interior_Big
   ModuleType: 0

@@ -1,15 +1,16 @@
 using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Tool.ModularHouseBuilder
 {
-    [CreateAssetMenu(fileName = "New Module", menuName = "scriptable/Tools/ModularHouseBuilder/Module")]
     public class ModuleData : ScriptableObject
     {
         public HouseModule Module;
         public Vector3 Extension;
         public Vector3 Rotation;
-        public Vector3 CenterOffset;
+        public Vector3 ColliderCenter;
 
         public string PrefabAssetPath;
         public string ModuleName;
@@ -17,47 +18,74 @@ namespace Tool.ModularHouseBuilder
         public ModuleType ModuleType;
         public Texture Preview;
 
-        public Vector3 CenterPoint => Extension / 2f;
+        public SnappingPoint[] SnappingPoints => _snappingPoints.SnappingPoints;
+        private SnappingPointsData _snappingPoints;
+        
+        public Vector3 GetLocalSnappingPosition(Vector3 pos) => GetClosestSnappingPoint(pos, _snappingPoints.SnappingPoints);
 
-        public Vector3 GetLocalSnappingPos(Vector3 pos, ModuleType moduleTypeFilter)
+        public Vector3 GetLocalSnappingPosition(Vector3 pos, ModuleType moduleTypeFilter)
         {
-            switch (moduleTypeFilter)
+            SnappingPoint[] filteredPoints = _snappingPoints.SnappingPoints.Where<SnappingPoint>(snapPoint => snapPoint.SnappingPointFilter == moduleTypeFilter || !snapPoint.UseFilter) as SnappingPoint[];
+            return GetClosestSnappingPoint(pos, filteredPoints);
+        }
+
+        private Vector3 GetClosestSnappingPoint(Vector3 pos, SnappingPoint[] points)
+        {
+            float dist = float.MaxValue;
+            SnappingPoint closestPoint = new SnappingPoint();
+
+            foreach (SnappingPoint point in points)
             {
-                case ModuleType.WALL:
-                    break;
-
-                case ModuleType.WALL_DECORATOR:
-                    break;
-
-                case ModuleType.DOOR:
-                    break;
-
-                case ModuleType.DOOR_FRAME:
-                    break;
-
-                case ModuleType.FLOOR:
-                    break;
-
-                case ModuleType.FLOOR_DECORATOR:
-                    break;
-
-                case ModuleType.WINDOW:
-                    break;
-
-                case ModuleType.WINDOW_FRAME:
-                    break;
-
-                case ModuleType.ROOF:
-                    break;
+                float distance = (point.LocalPoint - pos).magnitude;
+                if (distance < dist)
+                {
+                    closestPoint = point;
+                    dist = distance;
+                }
             }
 
-            return Vector3.zero;
+            if(dist == float.MaxValue)
+            {
+                Debug.LogWarning("NO SNAPPING POINT AVAILABLE FOR THIS OBJECT");
+                return Vector3.zero;
+            }
+
+            return closestPoint.LocalPoint;
         }
 
+        public void SetSnappingPointsData(SnappingPointsData snappingPointsData) => _snappingPoints = snappingPointsData;
+    }
 
-        private void GenerateLocalSnappingPositions()
+    public struct SnappingPoint
+    {
+        public bool UseFilter;
+        public Vector3 LocalPoint;
+        public ModuleType SnappingPointFilter;
+
+        public SnappingPoint(bool useFilter = false)
         {
-            Vector3[] snappingPositions = new Vector3[16];
+            this.UseFilter = useFilter;
+            LocalPoint = Vector3.zero;
+            SnappingPointFilter = ModuleType.WALL;
         }
+
+        public SnappingPoint(Vector3 localPos)
+        {
+            this.UseFilter = false;
+            LocalPoint = localPos;
+            SnappingPointFilter = ModuleType.WALL;
+        }
+
+        public SnappingPoint(Vector3 localPos, ModuleType filter)
+        {
+            this.UseFilter = true;
+            LocalPoint = localPos;
+            SnappingPointFilter = filter;
+        }
+    }
+
+    public struct SnappingPointsData
+    {
+        public SnappingPoint[] SnappingPoints;
     }
 }

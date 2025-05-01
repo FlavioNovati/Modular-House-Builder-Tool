@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Tool.ModularHouseBuilder
 {
     [CustomEditor(typeof(HouseModule))]
-    public class HouseBuilderModule_Editor : Editor
+    public class HouseModule_Editor : Editor
     {
         const float HANDLE_SIZE = 0.25f;
         const float HANDLE_SELECTED_SIZE = 0.3f;
@@ -53,7 +55,7 @@ namespace Tool.ModularHouseBuilder
 
             //Draw Object Extension
             Vector3 objectExtension = _module.ModuleData.Extension;
-            Vector3 offset = _module.ModuleData.CenterOffset;
+            Vector3 offset = _module.ModuleData.ColliderCenter;
 
             float yExtension = _module.ModuleData.Extension.y/2f + offset.y;
             float xExtension = _module.ModuleData.Extension.x/2f + offset.x;
@@ -91,6 +93,7 @@ namespace Tool.ModularHouseBuilder
                 Handles.DotHandleCap(-1, zHandlePos, Quaternion.identity, 0.005f, EventType.Repaint);
 
                 DrawExtensionLimit(_movedExtension);
+                DrawSnappingPositions(_module.ModuleData.SnappingPoints);
             }
 
             //Draw Handle Cap with Layout Event
@@ -108,7 +111,6 @@ namespace Tool.ModularHouseBuilder
                 _previousMousePos = Event.current.mousePosition;
 
                 Undo.RegisterCompleteObjectUndo(_module.ModuleData, "Module Modified");
-                Undo.FlushUndoRecordObjects();
             }
 
             //Mouse Drag -> expand selected extension
@@ -146,7 +148,6 @@ namespace Tool.ModularHouseBuilder
 
                 _movedExtension = movedExtention;
                 _previousMousePos = Event.current.mousePosition;
-                AssetDatabase.SaveAssets();
                 SceneView.RepaintAll();
             }
 
@@ -171,9 +172,9 @@ namespace Tool.ModularHouseBuilder
             Color fadeColor = Color.white;
             Color lineColor = Color.white;
             
-            float centerX = _module.ModuleData.CenterOffset.x;
-            float centerY = _module.ModuleData.CenterOffset.y;
-            float centerZ = _module.ModuleData.CenterOffset.z;
+            float centerX = _module.ModuleData.ColliderCenter.x;
+            float centerY = _module.ModuleData.ColliderCenter.y;
+            float centerZ = _module.ModuleData.ColliderCenter.z;
 
             float halfX = _module.ModuleData.Extension.x / 2f;
             float halfY = _module.ModuleData.Extension.y / 2f;
@@ -225,6 +226,19 @@ namespace Tool.ModularHouseBuilder
             Handles.DrawSolidRectangleWithOutline(bounds, fadeColor, lineColor);
         }
 
+        private void DrawSnappingPositions(SnappingPoint[] snappingPoints)
+        {
+            if(snappingPoints == null)
+                return;
+
+            foreach (SnappingPoint snappingPoint in snappingPoints)
+            {
+                Color pointColor = snappingPoint.UseFilter ? snappingPoint.SnappingPointFilter.ToColor() : Color.white;
+                Handles.color = pointColor;
+                Handles.SphereHandleCap(-1, snappingPoint.LocalPoint, Quaternion.identity, 0.05f, EventType.Repaint);
+            }
+        }
+
         public override void OnInspectorGUI()
         {
             if (PrefabStageUtility.GetCurrentPrefabStage() == null)
@@ -242,8 +256,16 @@ namespace Tool.ModularHouseBuilder
                 if (GUILayout.Button("Update Collider", GUILayout.ExpandWidth(true)))
                     UpdateCollider();
 
+            GUILayout.Space(5f);
             if (GUILayout.Button("Reset Extension", GUILayout.ExpandWidth(true)))
                 ResetExtension();
+
+            if(GUILayout.Button("Update Snapping Points", GUILayout.ExpandWidth(true)))
+            {
+                _module.ModuleData.CreateSnappingPoints();
+                EditorUtility.SetDirty(_module.ModuleData);
+                AssetDatabase.SaveAssets();
+            }
         }
 
         private void UpdateCollider()
@@ -254,8 +276,10 @@ namespace Tool.ModularHouseBuilder
             //Set Collider Size and Offset
             BoxCollider boxCollider = _module.gameObject.GetComponent<BoxCollider>();
             boxCollider.size = colliderSize;
+            _module.ModuleData.ColliderCenter = boxCollider.center;
 
             EditorUtility.SetDirty(_module);
+            EditorUtility.SetDirty(_module.ModuleData);
         }
 
         private void ResetExtension()

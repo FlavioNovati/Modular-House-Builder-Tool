@@ -20,7 +20,7 @@ namespace Tool.ModularHouseBuilder
 
             //Draw Extension
             Vector3 objectExtension = ModuleData.Extension;
-            Vector3 offset = ModuleData.CenterOffset;
+            Vector3 offset = ModuleData.ColliderCenter;
             Matrix4x4 handlesMatrix = Matrix4x4.TRS(transform.position + offset, transform.rotation, Vector3.one);
 
             Handles.matrix = handlesMatrix;

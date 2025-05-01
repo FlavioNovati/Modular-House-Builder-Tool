@@ -1,0 +1,82 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Tool.ModularHouseBuilder
+{
+    public static class ModuleData_ExtentionMethods
+    {
+        //Could be done better with Bound class, it's too late to change everything
+        public static void CreateSnappingPoints(this ModuleData moduleData)
+        {
+            //Generic cases
+
+            //All local
+            Vector3 extension = moduleData.Extension;
+            Vector3 center = moduleData.ColliderCenter;
+            Vector3 origin = center;
+            
+            float height = extension.y;
+            float width = extension.x;
+            float depth = extension.z;
+
+            List<SnappingPoint> points = new List<SnappingPoint>(8);
+
+            //Get lower points
+            SnappingPoint[] lowerPoints = new SnappingPoint[4];
+
+            Vector3 frwPos = origin + (Vector3.forward * depth/2f);
+            frwPos.y -= height / 2f;
+            lowerPoints[0] = new SnappingPoint(frwPos);
+
+            Vector3 rxPos = origin + (Vector3.right * width/2f);
+            rxPos.y -= height / 2f;
+            lowerPoints[1] = new SnappingPoint(rxPos);
+
+            Vector3 backPos = origin - (Vector3.forward * depth/2f);
+            backPos.y -= height / 2f;
+            lowerPoints[2] = new SnappingPoint(backPos);
+
+            Vector3 sxPos = origin - (Vector3.right * width/2f);
+            sxPos.y -= height / 2f;
+            lowerPoints[3] = new SnappingPoint(sxPos);
+
+            //Get Upper points
+            SnappingPoint[] upperPoints = new SnappingPoint[4];
+
+            Vector3 frwUPos = frwPos + (Vector3.up * height);
+            upperPoints[0] = new SnappingPoint(frwUPos);
+
+            Vector3 rxUPos = rxPos + (Vector3.up * height);
+            upperPoints[1] = new SnappingPoint(rxUPos);
+
+            Vector3 backUPos = backPos + (Vector3.up * height);
+            upperPoints[2] = new SnappingPoint(backUPos);
+
+            Vector3 sxUPos = sxPos + (Vector3.up * height);
+            upperPoints[3] = new SnappingPoint(sxUPos);
+
+            //Add Snapping positions
+            points.AddRange(lowerPoints);
+            points.AddRange(upperPoints);
+
+
+            //Additive cases
+            switch (moduleData.ModuleType)
+            {
+                case ModuleType.DOOR_FRAME:
+                    points.Add(new SnappingPoint(center, ModuleType.DOOR));
+                    break;
+
+                case ModuleType.WINDOW_FRAME:
+                    points.Add(new SnappingPoint(center, ModuleType.WINDOW));
+                    break;
+            }
+
+            //Set Points
+            SnappingPointsData snappingPointsData = new SnappingPointsData();
+            snappingPointsData.SnappingPoints = points.ToArray();
+
+            moduleData.SetSnappingPointsData(snappingPointsData);
+        }
+    }
+}
