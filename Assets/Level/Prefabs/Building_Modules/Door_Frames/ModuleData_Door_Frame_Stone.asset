@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7da09350c191f84889edcbf07a15c2d, type: 3}
-  m_Name: ModuleData_Window_Frame_Test_Frame
+  m_Name: ModuleData_Door_Frame_Stone
   m_EditorClassIdentifier: 
-  Module: {fileID: 4785183011546972707, guid: b26c89d0715ead246b06806afd74c7da, type: 3}
-  Extension: {x: 2, y: 3.1226892, z: 0.40648195}
+  Module: {fileID: 6085701620817851061, guid: b8ed3c01ae0397a4689da65b0f625b34, type: 3}
+  Extension: {x: 1.6031199, y: 2.5861712, z: 0.47716978}
   Rotation: {x: -90, y: 0, z: 0}
-  ColliderCenter: {x: 0, y: 1.5613441, z: 0}
-  PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Window_Frames/Module_Window_Frame_Test_Frame.prefab
-  ModuleName: Test_Frame
-  ModuleType: 128
+  ColliderCenter: {x: 0, y: 1.2930856, z: 0}
+  PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Door_Frames/Module_Door_Frame_Stone.prefab
+  ModuleName: Stone
+  ModuleType: 32
   Preview: {fileID: 0}

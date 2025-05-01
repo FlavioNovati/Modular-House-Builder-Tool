@@ -64,7 +64,9 @@ namespace Tool.ModularHouseBuilder
             switch (moduleData.ModuleType)
             {
                 case ModuleType.DOOR_FRAME:
-                    points.Add(new SnappingPoint(center, ModuleType.DOOR));
+                    Vector3 objectOrigin = center;
+                    objectOrigin.y = 0;
+                    points.Add(new SnappingPoint(objectOrigin, ModuleType.DOOR));
                     break;
 
                 case ModuleType.WINDOW_FRAME:

@@ -19,7 +19,7 @@ namespace Tool.ModularHouseBuilder
         public Texture Preview;
 
         public SnappingPoint[] SnappingPoints => _snappingPoints.SnappingPoints;
-        private SnappingPointsData _snappingPoints;
+        public SnappingPointsData _snappingPoints;
         
         public Vector3 GetLocalSnappingPosition(Vector3 pos) => GetClosestSnappingPoint(pos, _snappingPoints.SnappingPoints);
 
