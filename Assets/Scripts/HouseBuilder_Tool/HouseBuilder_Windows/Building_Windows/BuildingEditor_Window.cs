@@ -263,7 +263,8 @@ namespace Tool.ModularHouseBuilder.SubTool
                     if (Event.current.control)
                     {
                         //Snap
-
+                        HouseModule closestModule = GetClosestModule(nearModules);
+                        closestModule.ModuleData.GetLocalSnappingPos(_modulePose.position, _selectedModuleData.ModuleType);
                     }
                 }
             }
@@ -323,6 +324,7 @@ namespace Tool.ModularHouseBuilder.SubTool
         }
         #endregion
 
+        #region --------------- SNAPS -------------------------------
         private void SnapModuleToGrid()
         {
             Vector3 gridSize = EditorSnapSettings.gridSize;
@@ -334,6 +336,26 @@ namespace Tool.ModularHouseBuilder.SubTool
             Vector3 roundedRotation = _modulePose.rotation.eulerAngles.Round(degrees);
             _modulePose.rotation.eulerAngles = roundedRotation;
         }
+
+        private HouseModule GetClosestModule(List<HouseModule> modules)
+        {
+            HouseModule closestModule = null;
+            float distance = float.MaxValue;
+
+            for (int i = 0; i<modules.Count; i++)
+            {
+                float dist = Vector3.Distance(modules[i].transform.position, _modulePose.position);
+                if(dist < distance)
+                {
+                    distance = dist;
+                    closestModule = modules[i];
+                }
+            }
+
+            return closestModule;
+        }
+
+        #endregion
 
         private void InstantiateModule(ModuleData moduleData)
         {
