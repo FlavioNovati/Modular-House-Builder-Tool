@@ -21,11 +21,14 @@ namespace Tool.ModularHouseBuilder
         public List<SnappingPoint> SnappingPoints => _snappingPoints.Points;
         [SerializeField] private SnappingPointWrapper _snappingPoints;
 
-        public Vector3 GetLocalSnappingPosition(Vector3 pos) => GetClosestSnappingPoint(pos, SnappingPoints);
+        public Vector3 GetLocalSnappingPosition(Vector3 pos, Quaternion rot) => GetClosestSnappingPoint(pos, rot, SnappingPoints);
 
-        public Vector3 GetLocalSnappingPosition(Vector3 pos, ModuleType moduleTypeFilter)
+        public Vector3 GetLocalSnappingPosition(Vector3 pos, Quaternion rot, ModuleType moduleTypeFilter)
         {
-            List<SnappingPoint> filteredPoints = SnappingPoints;
+            //Filte Snap Positions
+            List<SnappingPoint> filteredPoints = new List<SnappingPoint>();
+            filteredPoints.AddRange(SnappingPoints);
+
             for (int i = 0; i < filteredPoints.Count; i++)
             {
                 SnappingPoint point = filteredPoints[i];
@@ -33,24 +36,33 @@ namespace Tool.ModularHouseBuilder
                     filteredPoints.Remove(point);
             }
 
-            return GetClosestSnappingPoint(pos, filteredPoints);
+            return GetClosestSnappingPoint(pos, rot, filteredPoints);
         }
 
-        private Vector3 GetClosestSnappingPoint(Vector3 pos, List<SnappingPoint> points)
+        private Vector3 GetClosestSnappingPoint(Vector3 pos, Quaternion rot, List<SnappingPoint> points)
         {
+            List<SnappingPoint> rotatedSnappingPoints = new List<SnappingPoint>();
+            for(int i=0; i<points.Count; i++)
+            {
+                SnappingPoint rotatedPoint = points[i];
+                rotatedPoint.LocalPoint = rot * rotatedPoint.LocalPoint;
+
+                rotatedSnappingPoints.Add(rotatedPoint);
+            }
+
             float dist = float.MaxValue;
             SnappingPoint closestPoint = new SnappingPoint();
 
-            foreach (SnappingPoint point in points)
+            foreach (SnappingPoint point in rotatedSnappingPoints)
             {
-                float distance = (point.LocalPoint - pos).magnitude;
+                float distance = (pos - point.LocalPoint).magnitude;
                 if (distance < dist)
                 {
                     closestPoint = point;
                     dist = distance;
                 }
             }
-
+            
             if(dist == float.MaxValue)
             {
                 Debug.LogWarning("NO SNAPPING POINT AVAILABLE FOR THIS OBJECT");

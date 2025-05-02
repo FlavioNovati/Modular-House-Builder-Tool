@@ -177,34 +177,61 @@ namespace Tool.ModularHouseBuilder.SubTool
             _allowOverlap = GUILayout.Toggle(_allowOverlap, "Allow Overlap");
         }
 
+
         private void OnSceneGUI(SceneView sceneView)
         {
             //Do all only if an object is selected
             if (_selectedModuleData == null)
                 return;
 
-            //Get Scene Camera
-            Camera sceneCamera = sceneView.camera;
 
-            //Reset Module position
-            _modulePose.position = Vector3.zero;
+            //Get Module Position
+            _modulePose.position = GetModulePositionViaRaycasting();
 
+            //Get Near modules
+            List<HouseModule> nearModules = GetNearModules(_modulePose, _selectedModuleData.Extension, _overlapSizeIncreaser);
             
-            //Get Point to place module
-            Plane worldPlane = new Plane(Vector3.up, Vector3.zero);
-            Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hitData))
+            if(Event.current.control)
             {
-                _modulePose.position = hitData.point;
+                if(nearModules.Count > 0)
+                {
+                    //Snap to module
+                    HouseModule closestModule = GetClosestModule(nearModules);
+                    _modulePose.position = ApplySnap(_selectedModuleData, closestModule, _modulePose);
+                }
+                else
+                {
+                    //Snap to grid
+                    _modulePose.position = SnapModuleToGrid(_modulePose.position);
+                }
             }
-            //Raycast on World Plane
-            else if (worldPlane.Raycast(ray, out float enter))
+            
+            //Get Colliding modules
+            List<HouseModule> collidingModules = GetCollidingModules(_modulePose, _selectedModuleData.Extension);
+
+            //Draw
+            DrawData(_selectedModuleData, _modulePose, nearModules, collidingModules);
+
+            //Repaint Scene View
+            SceneView.RepaintAll();
+
+            //Input handling
+            Event currentEvent = Event.current;
+            EventType currentEventType = currentEvent.type;
+
+            //Instanciate Module
+            if (currentEventType == EventType.MouseDown && currentEvent.button == 0)
             {
-                Vector3 collisionPoint = ray.GetPoint(enter);
-                //Update Module Position
-                _modulePose.position = collisionPoint;
-                _modulePose.position.y += _selectedModuleData.ColliderCenter.y;
+                //Instanciate module if allowed
+                if (collidingModules.Count <= 0 || _allowOverlap)
+                    InstantiateModule(_selectedModuleData);
+
+                currentEvent.Use();
             }
+
+            //Allow unselect module
+            if (currentEvent.keyCode == KeyCode.Escape && _selectedModuleData != null)
+                _selectedModuleData = null;
 
             //Module Rotation
             if (Event.current.shift)
@@ -221,102 +248,6 @@ namespace Tool.ModularHouseBuilder.SubTool
             //Snap Position
             //if (Event.current.control)
             //    SnapModuleToGrid();
-
-
-
-
-
-
-
-
-            //CHECK COLLISIONS
-            List<HouseModule> collidingModules = new List<HouseModule>();
-            List<HouseModule> nearModules = new List<HouseModule>();
-
-            //Get modules that are too close to selected module
-            collidingModules = OverlapBoxAtPoint(_modulePose.position, _modulePose.rotation, _selectedModuleData.Extension, -0.0005f);
-
-            //Analyze Collisions
-            if(collidingModules.Count <= 0 || _allowOverlap)
-            {
-                //Get near Modules
-                nearModules = OverlapBoxAtPoint(_modulePose.position, _modulePose.rotation, _selectedModuleData.Extension, _overlapSizeIncreaser);
-                if (Event.current.control)
-                {
-                    if(nearModules.Count > 0)
-                    {
-                        //Get nearest Module
-                        HouseModule closestModule = GetClosestModule(nearModules);
-                        //Draw Snapping Points
-                        DrawModuleSnapsPoints(closestModule);
-
-                        //Get Snapping Position
-                        Vector3 snappingPos = closestModule.ModuleData.GetLocalSnappingPosition(_modulePose.position, _selectedModuleData.ModuleType);
-                        //offset snapping pos
-                        snappingPos += closestModule.transform.position;
-                        
-                        //Update box position
-                        Vector3 snappingPosOffset = _selectedModuleData.GetLocalSnappingPosition(snappingPos);
-                        _modulePose.position = snappingPos + snappingPosOffset;
-                    }
-                }
-            }
-
-
-
-
-
-
-
-
-
-
-            //Show Module Preview
-            Material previewMaterial = collidingModules.Count <= 0 || _allowOverlap ? _previewMaterial_A : _previewMaterial_N;
-            DrawModulePreviewAtPoint(_selectedModuleData, _modulePose, previewMaterial);
-            
-            //Draw Module Collider
-            DrawBox(_modulePose.position, _modulePose.rotation, _selectedModuleData.Extension, 0f, Color.red);
-            //Draw Overlap box with size multiplier
-            DrawBox(_modulePose.position, _modulePose.rotation, _selectedModuleData.Extension, _overlapSizeIncreaser, Color.white);
-            //Draw near modules
-            DrawModulesOutlines(nearModules);
-
-            DrawModuleSnapsPoints(_selectedModuleData.Module);
-            Debug.Log("Painted - "+Time.time);
-
-            //Repaint Scene View
-            SceneView.RepaintAll();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //Input handling
-
-            //Instanciate Module
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
-            {
-                //Instanciate module if allowed
-                if(collidingModules.Count <= 0 || _allowOverlap)
-                    InstantiateModule(_selectedModuleData);
-
-                Event.current.Use();
-            }
-
-            //Allow unselect module
-            if (Event.current.keyCode == KeyCode.Escape && _selectedModuleData != null)
-                _selectedModuleData = null;
         }
         #endregion
 
@@ -351,11 +282,84 @@ namespace Tool.ModularHouseBuilder.SubTool
         }
         #endregion
 
+        #region------------ PHYSICS -----------------------------------
+        private Vector3 GetModulePositionViaRaycasting()
+        {
+            //Get Point to place module
+            Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hitData))
+            {
+                return hitData.point;
+            }
+            //Raycast on World Plane
+            else
+            {
+                Plane worldPlane = new Plane(Vector3.up, Vector3.zero);
+                if (worldPlane.Raycast(ray, out float enter))
+                {
+                    Vector3 collisionPoint = ray.GetPoint(enter);
+                    //Update Module Position
+                    return collisionPoint;
+                }
+            }
+
+            return Vector3.zero;
+        }
+
+        private List<HouseModule> GetCollidingModules(Pose pose, Vector3 extension) => OverlapBoxAtPoint(pose.position + (Vector3.up * extension.y / 2), pose.rotation, extension, -0.0005f);
+        private List<HouseModule> GetNearModules(Pose pose, Vector3 extension, float sizeIncreaser) => OverlapBoxAtPoint(pose.position + (Vector3.up * extension.y/2), pose.rotation, extension, sizeIncreaser);
+
+        private List<HouseModule> OverlapBoxAtPoint(Vector3 position, Quaternion rotation, Vector3 overlapExtents, float sizeIncreaser = 0f)
+        {
+            Collider[] overlapResult;
+            List<HouseModule> modules = new List<HouseModule>();
+
+            //Adjust overlap size
+            overlapExtents += (Vector3.one * sizeIncreaser);
+
+            //Get Colliding object
+            overlapResult = Physics.OverlapBox(position, overlapExtents / 2f, rotation);
+
+            //Get Only House Modules
+            foreach (Collider col in overlapResult)
+            {
+                if (col.gameObject.TryGetComponent<HouseModule>(out HouseModule module))
+                    modules.Add(module);
+            }
+
+            return modules;
+        }
+        #endregion
+
         #region --------------- SNAPS -------------------------------
-        private void SnapModuleToGrid()
+        private Vector3 ApplySnap(ModuleData moduleToSnap, HouseModule snapDestinationModule, Pose pose)
+        {
+            Quaternion snapRotation = pose.rotation;
+            Vector3 destinationPos;
+
+            //snap destination closest snap point
+            Vector3 localPos = pose.position - snapDestinationModule.transform.position;
+            Vector3 closestSnappingPos = snapDestinationModule.ModuleData.GetLocalSnappingPosition(localPos, snapDestinationModule.transform.rotation);
+            closestSnappingPos += snapDestinationModule.transform.position;
+
+            destinationPos = closestSnappingPos;
+
+            //Module to snap closest snap pos
+            Vector3 localPos2 = destinationPos - pose.position;
+            Vector3 closestSnapPos = moduleToSnap.GetLocalSnappingPosition(localPos2, snapRotation);
+            closestSnapPos += pose.position;
+
+            Handles.color = Color.magenta;
+            Handles.DrawLine(closestSnapPos, destinationPos);
+
+            return pose.position;
+        }
+
+        
+        private Vector3 SnapModuleToGrid(Vector3 position)
         {
             Vector3 gridSize = EditorSnapSettings.gridSize;
-            _modulePose.position = _modulePose.position.Round(gridSize.x);
+            return position.Round(gridSize.x);
         }
 
         private void SnapRotation(float degrees)
@@ -381,7 +385,6 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             return closestModule;
         }
-
         #endregion
 
         private void InstantiateModule(ModuleData moduleData)
@@ -405,28 +408,33 @@ namespace Tool.ModularHouseBuilder.SubTool
             Undo.FlushUndoRecordObjects();
         }
 
-        private List<HouseModule> OverlapBoxAtPoint(Vector3 position, Quaternion rotation, Vector3 overlapExtents, float sizeIncreaser = 0f)
-        {
-            Collider[] overlapResult;
-            List<HouseModule> modules = new List<HouseModule>();
-
-            //Adjust overlap size
-            overlapExtents += (Vector3.one * sizeIncreaser);
-
-            //Get Colliding object
-            overlapResult = Physics.OverlapBox(position, overlapExtents/2f, rotation);
-
-            //Get Only House Modules
-            foreach (Collider col in overlapResult)
-            {
-                if (col.gameObject.TryGetComponent<HouseModule>(out HouseModule module))
-                    modules.Add(module);
-            }
-
-            return modules;
-        }
-
         #region ------------ DRAW METHODS -----------------------------
+        
+        private void DrawData(ModuleData selectedModuleData, Pose selectedModulePose, List<HouseModule> nearModules, List<HouseModule> collidingModules)
+        {
+            Vector3 selectedModuleDataCenterpos = selectedModulePose.position + (Vector3.up * selectedModuleData.Extension.y / 2);
+
+            //Show Module Preview
+            Material previewMaterial = collidingModules.Count <= 0 || _allowOverlap ? _previewMaterial_A : _previewMaterial_N;
+            DrawModulePreviewAtPoint(selectedModuleData, selectedModulePose, previewMaterial);
+
+            //Draw Module Collider
+            DrawBox(selectedModuleDataCenterpos, selectedModulePose.rotation, selectedModuleData.Extension, 0f, Color.red);
+
+            //Draw Overlap box with size multiplier
+            DrawBox(selectedModuleDataCenterpos, selectedModulePose.rotation, selectedModuleData.Extension, _overlapSizeIncreaser, Color.white);
+
+            //Draw near modules
+            DrawModulesOutlines(nearModules);
+
+            //Draw All snapping points
+            DrawModuleSnapsPoints(selectedModuleData, selectedModulePose);
+
+            foreach(HouseModule houseModule in nearModules)
+                DrawModuleSnapsPoints(houseModule);
+        }
+        
+        
         private void DrawBox(Vector3 boxPosition, Quaternion boxRotation, Vector3 boxExtents, float sizeIncreaser, Color color)
         {
             boxExtents += (Vector3.one * sizeIncreaser);
@@ -438,6 +446,8 @@ namespace Tool.ModularHouseBuilder.SubTool
 
             //Draw Box
             Handles.DrawWireCube(Vector3.zero, boxExtents);
+
+            Handles.matrix = Matrix4x4.identity;
         }
 
         private void DrawModulePreviewAtPoint(ModuleData moduleToShow, Pose modulePose, Material previewMaterial)
@@ -456,6 +466,8 @@ namespace Tool.ModularHouseBuilder.SubTool
 
                 Graphics.DrawMeshNow(filter.sharedMesh, childToWorldMatrix);
             }
+
+            Handles.matrix = Matrix4x4.identity;
         }
 
         private void DrawModulesOutlines(List<HouseModule> modules)
@@ -480,13 +492,52 @@ namespace Tool.ModularHouseBuilder.SubTool
             if (snappingPoints == null)
                 return;
 
-            Vector3 heightOffset = module.ModuleData.Extension.y/2f * Vector3.up;
+            Matrix4x4 handlesMatrix = Matrix4x4.TRS(module.transform.position, module.transform.rotation, Vector3.one);
+            Handles.matrix = handlesMatrix;
 
             foreach (SnappingPoint snappingPoint in snappingPoints)
             {
                 Color pointColor = snappingPoint.UseFilter ? snappingPoint.SnappingPointFilter.ToColor() : Color.white;
                 Handles.color = pointColor;
-                Handles.SphereHandleCap(-1, module.transform.position + snappingPoint.LocalPoint - heightOffset, Quaternion.identity, 0.05f, EventType.Repaint);
+
+                Handles.SphereHandleCap(-1, snappingPoint.LocalPoint, Quaternion.identity, 0.05f, EventType.Repaint);
+            }
+
+            Handles.matrix = Matrix4x4.identity;
+        }
+
+        private void DrawModuleSnapsPoints(ModuleData module, Pose pose)
+        {
+            List<SnappingPoint> snappingPoints = module.SnappingPoints;
+
+            if (snappingPoints == null)
+                return;
+
+            Handles.matrix = Matrix4x4.TRS(pose.position, pose.rotation, Vector3.one);
+
+            foreach (SnappingPoint snappingPoint in snappingPoints)
+            {
+                Color pointColor = snappingPoint.UseFilter ? snappingPoint.SnappingPointFilter.ToColor() : Color.white;
+                Handles.color = pointColor;
+                Handles.SphereHandleCap(-1, snappingPoint.LocalPoint, Quaternion.identity, 0.15f, EventType.Repaint);
+            }
+
+            Handles.matrix = Matrix4x4.identity;
+        }
+
+        private void DrawModuleSnapsPoints(ModuleData module, Pose pose, Color color)
+        {
+            List<SnappingPoint> snappingPoints = module.SnappingPoints;
+
+            if (snappingPoints == null)
+                return;
+
+            Handles.matrix = Matrix4x4.identity;
+
+            foreach (SnappingPoint snappingPoint in snappingPoints)
+            {
+                Handles.color = color;
+                Handles.SphereHandleCap(-1, pose.position + snappingPoint.LocalPoint, Quaternion.identity, 0.25f, EventType.Repaint);
             }
         }
 

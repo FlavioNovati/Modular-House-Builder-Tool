@@ -66,6 +66,7 @@ namespace Tool.ModularHouseBuilder
             switch (moduleData.ModuleType)
             {
                 case ModuleType.DOOR:
+                    points.Clear();
                     points.Add(new SnappingPoint(objectOrigin, ModuleType.DOOR));
                     break;
 
@@ -74,6 +75,7 @@ namespace Tool.ModularHouseBuilder
                     break;
 
                 case ModuleType.WINDOW:
+                    points.Clear();
                     points.Add(new SnappingPoint(objectOrigin, ModuleType.WINDOW));
                     break;
 

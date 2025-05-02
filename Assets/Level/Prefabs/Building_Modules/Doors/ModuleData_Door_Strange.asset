@@ -22,30 +22,6 @@ MonoBehaviour:
   Preview: {fileID: 0}
   _snappingPoints:
     Points:
-    - UseFilter: 0
-      LocalPoint: {x: 0, y: 0, z: 0.104673095}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0.5589331, y: 0, z: 0}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0, y: 0, z: -0.104673095}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: -0.5589331, y: 0, z: 0}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0, y: 2.0918596, z: 0.104673095}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0.5589331, y: 2.0918596, z: 0}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0, y: 2.0918596, z: -0.104673095}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: -0.5589331, y: 2.0918596, z: 0}
-      SnappingPointFilter: 0
     - UseFilter: 1
       LocalPoint: {x: 0, y: 0, z: 0}
       SnappingPointFilter: 16
