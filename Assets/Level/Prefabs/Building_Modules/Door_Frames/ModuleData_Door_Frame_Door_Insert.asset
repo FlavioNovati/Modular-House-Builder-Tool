@@ -46,6 +46,3 @@ MonoBehaviour:
     - UseFilter: 0
       LocalPoint: {x: -1, y: 3.1226888, z: 0}
       SnappingPointFilter: 0
-    - UseFilter: 1
-      LocalPoint: {x: 0, y: 0, z: 0}
-      SnappingPointFilter: 16

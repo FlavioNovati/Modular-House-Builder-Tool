@@ -25,9 +25,13 @@ namespace Tool.ModularHouseBuilder
 
         public Vector3 GetLocalSnappingPosition(Vector3 pos, ModuleType moduleTypeFilter)
         {
-            List<SnappingPoint> filteredPoints = SnappingPoints.Where<SnappingPoint>(snapPoint =>
-            !snapPoint.UseFilter || (snapPoint.UseFilter && snapPoint.SnappingPointFilter == moduleTypeFilter))
-                as List<SnappingPoint>;
+            List<SnappingPoint> filteredPoints = SnappingPoints;
+            for (int i = 0; i < filteredPoints.Count; i++)
+            {
+                SnappingPoint point = filteredPoints[i];
+                if (point.UseFilter && moduleTypeFilter != point.SnappingPointFilter)
+                    filteredPoints.Remove(point);
+            }
 
             return GetClosestSnappingPoint(pos, filteredPoints);
         }
