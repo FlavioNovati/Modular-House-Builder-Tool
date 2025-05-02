@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace Tool.ModularHouseBuilder
 {
@@ -226,7 +225,7 @@ namespace Tool.ModularHouseBuilder
             Handles.DrawSolidRectangleWithOutline(bounds, fadeColor, lineColor);
         }
 
-        private void DrawSnappingPositions(SnappingPoint[] snappingPoints)
+        private void DrawSnappingPositions(List<SnappingPoint> snappingPoints)
         {
             if(snappingPoints == null)
                 return;
@@ -263,8 +262,7 @@ namespace Tool.ModularHouseBuilder
             if(GUILayout.Button("Update Snapping Points", GUILayout.ExpandWidth(true)))
             {
                 _module.ModuleData.CreateSnappingPoints();
-                EditorUtility.SetDirty(_module.ModuleData);
-                AssetDatabase.SaveAssets();
+                _module.ModuleData.Save();
             }
         }
 

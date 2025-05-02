@@ -18,18 +18,21 @@ namespace Tool.ModularHouseBuilder
         public ModuleType ModuleType;
         public Texture Preview;
 
-        public SnappingPoint[] SnappingPoints => _snappingPoints.SnappingPoints;
-        public SnappingPointsData _snappingPoints;
-        
-        public Vector3 GetLocalSnappingPosition(Vector3 pos) => GetClosestSnappingPoint(pos, _snappingPoints.SnappingPoints);
+        public List<SnappingPoint> SnappingPoints => _snappingPoints.Points;
+        [SerializeField] private SnappingPointWrapper _snappingPoints;
+
+        public Vector3 GetLocalSnappingPosition(Vector3 pos) => GetClosestSnappingPoint(pos, SnappingPoints);
 
         public Vector3 GetLocalSnappingPosition(Vector3 pos, ModuleType moduleTypeFilter)
         {
-            SnappingPoint[] filteredPoints = _snappingPoints.SnappingPoints.Where<SnappingPoint>(snapPoint => snapPoint.SnappingPointFilter == moduleTypeFilter || !snapPoint.UseFilter) as SnappingPoint[];
+            List<SnappingPoint> filteredPoints = SnappingPoints.Where<SnappingPoint>(snapPoint =>
+            !snapPoint.UseFilter || (snapPoint.UseFilter && snapPoint.SnappingPointFilter == moduleTypeFilter))
+                as List<SnappingPoint>;
+
             return GetClosestSnappingPoint(pos, filteredPoints);
         }
 
-        private Vector3 GetClosestSnappingPoint(Vector3 pos, SnappingPoint[] points)
+        private Vector3 GetClosestSnappingPoint(Vector3 pos, List<SnappingPoint> points)
         {
             float dist = float.MaxValue;
             SnappingPoint closestPoint = new SnappingPoint();
@@ -53,9 +56,16 @@ namespace Tool.ModularHouseBuilder
             return closestPoint.LocalPoint;
         }
 
-        public void SetSnappingPointsData(SnappingPointsData snappingPointsData) => _snappingPoints = snappingPointsData;
+        public void SetSnappingPointsData(List<SnappingPoint> snappingPoints) => _snappingPoints.Points = snappingPoints;
     }
 
+    [System.Serializable]
+    public struct SnappingPointWrapper
+    {
+        public List<SnappingPoint> Points;
+    }
+
+    [System.Serializable]
     public struct SnappingPoint
     {
         public bool UseFilter;
@@ -82,10 +92,5 @@ namespace Tool.ModularHouseBuilder
             LocalPoint = localPos;
             SnappingPointFilter = filter;
         }
-    }
-
-    public struct SnappingPointsData
-    {
-        public SnappingPoint[] SnappingPoints;
     }
 }

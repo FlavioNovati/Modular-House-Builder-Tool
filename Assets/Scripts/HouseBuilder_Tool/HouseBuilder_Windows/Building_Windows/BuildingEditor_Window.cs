@@ -264,7 +264,12 @@ namespace Tool.ModularHouseBuilder.SubTool
                     {
                         //Snap
                         HouseModule closestModule = GetClosestModule(nearModules);
-                        closestModule.ModuleData.GetLocalSnappingPosition(_modulePose.position, _selectedModuleData.ModuleType);
+                        Vector3 snappingPos = closestModule.ModuleData.GetLocalSnappingPosition(_modulePose.position);
+                        //offset snapping pos
+                        snappingPos += closestModule.transform.position;
+
+                        //get selected module snap pos
+                        _modulePose.position = _selectedModuleData.GetLocalSnappingPosition(snappingPos) + _modulePose.position;
                     }
                 }
             }

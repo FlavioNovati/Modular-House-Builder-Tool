@@ -20,3 +20,32 @@ MonoBehaviour:
   ModuleName: Stone
   ModuleType: 32
   Preview: {fileID: 0}
+  _snappingPoints:
+    Points:
+    - UseFilter: 0
+      LocalPoint: {x: 0, y: 0, z: 0.23858489}
+      SnappingPointFilter: 0
+    - UseFilter: 0
+      LocalPoint: {x: 0.8015599, y: 0, z: 0}
+      SnappingPointFilter: 0
+    - UseFilter: 0
+      LocalPoint: {x: 0, y: 0, z: -0.23858489}
+      SnappingPointFilter: 0
+    - UseFilter: 0
+      LocalPoint: {x: -0.8015599, y: 0, z: 0}
+      SnappingPointFilter: 0
+    - UseFilter: 0
+      LocalPoint: {x: 0, y: 2.5861712, z: 0.23858489}
+      SnappingPointFilter: 0
+    - UseFilter: 0
+      LocalPoint: {x: 0.8015599, y: 2.5861712, z: 0}
+      SnappingPointFilter: 0
+    - UseFilter: 0
+      LocalPoint: {x: 0, y: 2.5861712, z: -0.23858489}
+      SnappingPointFilter: 0
+    - UseFilter: 0
+      LocalPoint: {x: -0.8015599, y: 2.5861712, z: 0}
+      SnappingPointFilter: 0
+    - UseFilter: 1
+      LocalPoint: {x: 0, y: 0, z: 0}
+      SnappingPointFilter: 16

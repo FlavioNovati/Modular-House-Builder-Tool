@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Tool.ModularHouseBuilder
@@ -13,8 +14,9 @@ namespace Tool.ModularHouseBuilder
             //All local
             Vector3 extension = moduleData.Extension;
             Vector3 center = moduleData.ColliderCenter;
-            Vector3 origin = center;
-            
+            Vector3 objectOrigin = center;
+            objectOrigin.y = 0;
+
             float height = extension.y;
             float width = extension.x;
             float depth = extension.z;
@@ -24,19 +26,19 @@ namespace Tool.ModularHouseBuilder
             //Get lower points
             SnappingPoint[] lowerPoints = new SnappingPoint[4];
 
-            Vector3 frwPos = origin + (Vector3.forward * depth/2f);
+            Vector3 frwPos = center + (Vector3.forward * depth / 2f);
             frwPos.y -= height / 2f;
             lowerPoints[0] = new SnappingPoint(frwPos);
 
-            Vector3 rxPos = origin + (Vector3.right * width/2f);
+            Vector3 rxPos = center + (Vector3.right * width / 2f);
             rxPos.y -= height / 2f;
             lowerPoints[1] = new SnappingPoint(rxPos);
 
-            Vector3 backPos = origin - (Vector3.forward * depth/2f);
+            Vector3 backPos = center - (Vector3.forward * depth / 2f);
             backPos.y -= height / 2f;
             lowerPoints[2] = new SnappingPoint(backPos);
 
-            Vector3 sxPos = origin - (Vector3.right * width/2f);
+            Vector3 sxPos = center - (Vector3.right * width / 2f);
             sxPos.y -= height / 2f;
             lowerPoints[3] = new SnappingPoint(sxPos);
 
@@ -63,10 +65,16 @@ namespace Tool.ModularHouseBuilder
             //Additive cases
             switch (moduleData.ModuleType)
             {
-                case ModuleType.DOOR_FRAME:
-                    Vector3 objectOrigin = center;
-                    objectOrigin.y = 0;
+                case ModuleType.DOOR:
                     points.Add(new SnappingPoint(objectOrigin, ModuleType.DOOR));
+                    break;
+
+                case ModuleType.DOOR_FRAME:
+                    points.Add(new SnappingPoint(objectOrigin, ModuleType.DOOR));
+                    break;
+
+                case ModuleType.WINDOW:
+                    points.Add(new SnappingPoint(objectOrigin, ModuleType.WINDOW));
                     break;
 
                 case ModuleType.WINDOW_FRAME:
@@ -75,10 +83,8 @@ namespace Tool.ModularHouseBuilder
             }
 
             //Set Points
-            SnappingPointsData snappingPointsData = new SnappingPointsData();
-            snappingPointsData.SnappingPoints = points.ToArray();
-
-            moduleData.SetSnappingPointsData(snappingPointsData);
+            moduleData.SetSnappingPointsData(points);
+            moduleData.Save();
         }
     }
 }
