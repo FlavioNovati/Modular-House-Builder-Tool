@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Tool.ModularHouseBuilder
 {
@@ -18,8 +19,13 @@ namespace Tool.ModularHouseBuilder
         public ModuleType ModuleType;
         public Texture Preview;
 
-        public List<SnappingPoint> SnappingPoints => _snappingPoints.Points;
-        [SerializeField] private SnappingPointWrapper _snappingPoints;
+        [SerializeField] public List<SnappingPoint> SnappingPoints
+        {
+            get => _snappingPoints.Points;
+            set => _snappingPoints.Points = value;
+        }
+
+        [SerializeField] public SnappingPointWrapper _snappingPoints;
 
         public Vector3 GetLocalSnappingPosition(Vector3 pos, Quaternion rot) => GetClosestSnappingPoint(pos, rot, SnappingPoints);
 
@@ -75,40 +81,5 @@ namespace Tool.ModularHouseBuilder
         }
 
         public void SetSnappingPointsData(List<SnappingPoint> snappingPoints) => _snappingPoints.Points = snappingPoints;
-    }
-
-    [System.Serializable]
-    public struct SnappingPointWrapper
-    {
-        public List<SnappingPoint> Points;
-    }
-
-    [System.Serializable]
-    public struct SnappingPoint
-    {
-        public bool UseFilter;
-        public Vector3 LocalPoint;
-        public ModuleType SnappingPointFilter;
-
-        public SnappingPoint(bool useFilter = false)
-        {
-            this.UseFilter = useFilter;
-            LocalPoint = Vector3.zero;
-            SnappingPointFilter = ModuleType.WALL;
-        }
-
-        public SnappingPoint(Vector3 localPos)
-        {
-            this.UseFilter = false;
-            LocalPoint = localPos;
-            SnappingPointFilter = ModuleType.WALL;
-        }
-
-        public SnappingPoint(Vector3 localPos, ModuleType filter)
-        {
-            this.UseFilter = true;
-            LocalPoint = localPos;
-            SnappingPointFilter = filter;
-        }
     }
 }

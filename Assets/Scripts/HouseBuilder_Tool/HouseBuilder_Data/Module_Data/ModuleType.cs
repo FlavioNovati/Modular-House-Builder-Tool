@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Tool.ModularHouseBuilder
 {
+    [System.Serializable]
     public enum ModuleType
     {
         WALL = 0,

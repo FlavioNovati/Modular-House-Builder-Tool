@@ -22,7 +22,9 @@ namespace Tool.ModularHouseBuilder
         private bool _useBoundsForCollisions = true;
         private int _nearestHandle;
         private Vector2 _previousMousePos;
-        
+
+        [SerializeField] public List<SnappingPoint> SnappingPoints;
+
         private enum ExtensionMoved
         {
             NONE,
@@ -32,11 +34,16 @@ namespace Tool.ModularHouseBuilder
         }
         private ExtensionMoved _movedExtension;
 
+        private SerializedObject _serializedObject;
 
         void OnEnable()
         {
             _module = (HouseModule)target;
             _meshFilter = _module.GetComponentInChildren<MeshFilter>();
+
+            SnappingPoints = _module.ModuleData.SnappingPoints;
+
+            _serializedObject = new SerializedObject(this);
         }
 
         private void OnDisable()
@@ -240,6 +247,8 @@ namespace Tool.ModularHouseBuilder
 
         public override void OnInspectorGUI()
         {
+            _serializedObject.Update();
+
             if (PrefabStageUtility.GetCurrentPrefabStage() == null)
             {
                 if (GUILayout.Button("Edit Module", GUILayout.ExpandWidth(true)))
@@ -259,11 +268,16 @@ namespace Tool.ModularHouseBuilder
             if (GUILayout.Button("Reset Extension", GUILayout.ExpandWidth(true)))
                 ResetExtension();
 
-            if(GUILayout.Button("Update Snapping Points", GUILayout.ExpandWidth(true)))
+            if(GUILayout.Button("Reset Snapping Points", GUILayout.ExpandWidth(true)))
             {
                 _module.ModuleData.CreateSnappingPoints();
                 _module.ModuleData.Save();
+                Repaint();
             }
+
+            GUILayout.Space(15f);
+            EditorGUILayout.PropertyField(_serializedObject.FindProperty("SnappingPoints"), true);
+            _serializedObject.ApplyModifiedProperties();
         }
 
         private void UpdateCollider()
@@ -285,7 +299,7 @@ namespace Tool.ModularHouseBuilder
             //Get Params
             Vector3 meshScale = _meshFilter.gameObject.transform.lossyScale;
             Vector3 meshRotation = _module.ModuleData.Rotation;
-
+             
             //Get Collider Size
             Vector3 extendsSize = _meshFilter.sharedMesh.bounds.extents * 2f;
 

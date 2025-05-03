@@ -358,18 +358,17 @@ namespace Tool.ModularHouseBuilder.SubTool
             Vector3 localPos2 = destinationPos - pose.position;
             Vector3 closestSnapPos = moduleToSnap.GetLocalSnappingPosition(localPos2, snapRotation);
             Vector3 rotatedOffset = closestSnapPos;
-            closestSnapPos += pose.position;
 
 
             //closest snap pos is the global point nearest of the pose
             //destination pos is the global point nearest of the destinationpose
 
             Handles.color = Color.magenta;
-            Handles.DrawLine(closestSnapPos, destinationPos);
+            Handles.DrawLine(closestSnapPos + pose.position, destinationPos);
 
-            Vector3 finalPoint = destinationPos + snapOffset;
+            Vector3 finalPoint = destinationPos - closestSnapPos;
 
-            return pose.position;
+            return finalPoint;
         }
 
 

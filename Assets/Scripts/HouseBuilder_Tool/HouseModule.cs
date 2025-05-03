@@ -9,8 +9,8 @@ namespace Tool.ModularHouseBuilder
 {
     public class HouseModule : MonoBehaviour
     {
-        public ModuleData ModuleData;
-        public ModuleType ModuleType => ModuleData.ModuleType;
+        [HideInInspector] public ModuleData ModuleData;
+        [HideInInspector] public ModuleType ModuleType => ModuleData.ModuleType;
 
         #if UNITY_EDITOR
         private void OnDrawGizmos()

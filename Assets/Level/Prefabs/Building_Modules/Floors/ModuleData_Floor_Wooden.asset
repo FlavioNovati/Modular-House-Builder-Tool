@@ -10,39 +10,39 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7da09350c191f84889edcbf07a15c2d, type: 3}
-  m_Name: ModuleData_Wall_Balcony_0
+  m_Name: ModuleData_Floor_Wooden
   m_EditorClassIdentifier: 
-  Module: {fileID: 7832090557261667174, guid: e19b33fab5fbb3141b6271c8741544ae, type: 3}
-  Extension: {x: 2.0000007, y: 1.2298869, z: 0.20628308}
+  Module: {fileID: 2237030122369438718, guid: 7a8ca8f2119ed804db62aba8fa178e97, type: 3}
+  Extension: {x: 2, y: 0.020000491, z: 1.9999999}
   Rotation: {x: -90, y: 0, z: 0}
-  ColliderCenter: {x: 0, y: 0.61494327, z: 0}
-  PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Walls/Module_Wall_Balcony_0.prefab
-  ModuleName: Balcony_0
-  ModuleType: 0
+  ColliderCenter: {x: 0, y: 0.010000246, z: 0}
+  PrefabAssetPath: Assets/Level/Prefabs/Building_Modules/Floors/Module_Floor_Wooden.prefab
+  ModuleName: Wooden
+  ModuleType: 2
   Preview: {fileID: 0}
   _snappingPoints:
     Points:
     - UseFilter: 1
-      LocalPoint: {x: 0, y: -0.00000017881393, z: 0.10314154}
+      LocalPoint: {x: 0, y: 0, z: 0.99999994}
       SnappingPointFilter: 0
     - UseFilter: 1
-      LocalPoint: {x: 1.0000004, y: -0.00000017881393, z: 0}
+      LocalPoint: {x: 1, y: 0, z: 0}
       SnappingPointFilter: 0
     - UseFilter: 1
-      LocalPoint: {x: 0, y: -0.00000017881393, z: -0.10314154}
+      LocalPoint: {x: 0, y: 0, z: -0.99999994}
       SnappingPointFilter: 0
     - UseFilter: 1
-      LocalPoint: {x: -1.0000004, y: -0.00000017881393, z: 0}
+      LocalPoint: {x: -1, y: 0, z: 0}
       SnappingPointFilter: 0
     - UseFilter: 1
-      LocalPoint: {x: 0, y: 1.2298868, z: 0.10314154}
+      LocalPoint: {x: 0, y: 0.020000491, z: 0.99999994}
       SnappingPointFilter: 0
     - UseFilter: 1
-      LocalPoint: {x: 1.0000004, y: 1.2298868, z: 0}
+      LocalPoint: {x: 1, y: 0.020000491, z: 0}
       SnappingPointFilter: 0
     - UseFilter: 1
-      LocalPoint: {x: 0, y: 1.2298868, z: -0.10314154}
+      LocalPoint: {x: 0, y: 0.020000491, z: -0.99999994}
       SnappingPointFilter: 0
     - UseFilter: 1
-      LocalPoint: {x: -1.0000004, y: 1.2298868, z: 0}
+      LocalPoint: {x: -1, y: 0.020000491, z: 0}
       SnappingPointFilter: 0
