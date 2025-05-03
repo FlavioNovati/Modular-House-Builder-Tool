@@ -29,10 +29,9 @@ namespace Tool.ModularHouseBuilder
             List<SnappingPoint> filteredPoints = new List<SnappingPoint>();
             filteredPoints.AddRange(SnappingPoints);
 
-            for (int i = 0; i < filteredPoints.Count; i++)
+            foreach (SnappingPoint point in SnappingPoints)
             {
-                SnappingPoint point = filteredPoints[i];
-                if (point.UseFilter && moduleTypeFilter != point.SnappingPointFilter)
+                if (point.UseFilter && point.SnappingPointFilter != moduleTypeFilter)
                     filteredPoints.Remove(point);
             }
 
@@ -41,6 +40,9 @@ namespace Tool.ModularHouseBuilder
 
         private Vector3 GetClosestSnappingPoint(Vector3 pos, Quaternion rot, List<SnappingPoint> points)
         {
+            if(points.Count <= 0)
+                return pos;
+
             List<SnappingPoint> rotatedSnappingPoints = new List<SnappingPoint>();
             for(int i=0; i<points.Count; i++)
             {

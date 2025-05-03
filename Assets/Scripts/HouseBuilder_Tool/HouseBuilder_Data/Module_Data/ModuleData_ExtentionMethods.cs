@@ -28,39 +28,38 @@ namespace Tool.ModularHouseBuilder
 
             Vector3 frwPos = center + (Vector3.forward * depth / 2f);
             frwPos.y -= height / 2f;
-            lowerPoints[0] = new SnappingPoint(frwPos);
+            lowerPoints[0] = new SnappingPoint(frwPos, ModuleType.WALL);
 
             Vector3 rxPos = center + (Vector3.right * width / 2f);
             rxPos.y -= height / 2f;
-            lowerPoints[1] = new SnappingPoint(rxPos);
+            lowerPoints[1] = new SnappingPoint(rxPos, ModuleType.WALL);
 
             Vector3 backPos = center - (Vector3.forward * depth / 2f);
             backPos.y -= height / 2f;
-            lowerPoints[2] = new SnappingPoint(backPos);
+            lowerPoints[2] = new SnappingPoint(backPos, ModuleType.WALL);
 
             Vector3 sxPos = center - (Vector3.right * width / 2f);
             sxPos.y -= height / 2f;
-            lowerPoints[3] = new SnappingPoint(sxPos);
+            lowerPoints[3] = new SnappingPoint(sxPos, ModuleType.WALL);
 
             //Get Upper points
             SnappingPoint[] upperPoints = new SnappingPoint[4];
 
             Vector3 frwUPos = frwPos + (Vector3.up * height);
-            upperPoints[0] = new SnappingPoint(frwUPos);
+            upperPoints[0] = new SnappingPoint(frwUPos, ModuleType.WALL);
 
             Vector3 rxUPos = rxPos + (Vector3.up * height);
-            upperPoints[1] = new SnappingPoint(rxUPos);
+            upperPoints[1] = new SnappingPoint(rxUPos, ModuleType.WALL);
 
             Vector3 backUPos = backPos + (Vector3.up * height);
-            upperPoints[2] = new SnappingPoint(backUPos);
+            upperPoints[2] = new SnappingPoint(backUPos, ModuleType.WALL);
 
             Vector3 sxUPos = sxPos + (Vector3.up * height);
-            upperPoints[3] = new SnappingPoint(sxUPos);
+            upperPoints[3] = new SnappingPoint(sxUPos, ModuleType.WALL);
 
             //Add Snapping positions
             points.AddRange(lowerPoints);
             points.AddRange(upperPoints);
-
 
             //Additive cases
             switch (moduleData.ModuleType)

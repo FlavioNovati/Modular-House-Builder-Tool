@@ -332,30 +332,47 @@ namespace Tool.ModularHouseBuilder.SubTool
         #endregion
 
         #region --------------- SNAPS -------------------------------
-        private Vector3 ApplySnap(ModuleData moduleToSnap, HouseModule snapDestinationModule, Pose pose)
+        private Vector3 ApplySnap(ModuleData moduleToSnap, HouseModule destinationModule, Pose pose)
         {
             Quaternion snapRotation = pose.rotation;
             Vector3 destinationPos;
 
             //snap destination closest snap point
-            Vector3 localPos = pose.position - snapDestinationModule.transform.position;
-            Vector3 closestSnappingPos = snapDestinationModule.ModuleData.GetLocalSnappingPosition(localPos, snapDestinationModule.transform.rotation);
-            closestSnappingPos += snapDestinationModule.transform.position;
+            Vector3 localPos = pose.position - destinationModule.transform.position;
+
+            Vector3 closestSnappingPos;
+            Vector3 snapOffset;
+
+            //Apply Filter
+            if(moduleToSnap.ModuleType == ModuleType.DOOR || moduleToSnap.ModuleType == ModuleType.WINDOW)
+                closestSnappingPos = destinationModule.ModuleData.GetLocalSnappingPosition(localPos, destinationModule.transform.rotation, moduleToSnap.ModuleType);
+            else
+                closestSnappingPos = destinationModule.ModuleData.GetLocalSnappingPosition(localPos, destinationModule.transform.rotation);
+
+            snapOffset = closestSnappingPos;
+            closestSnappingPos += destinationModule.transform.position;
 
             destinationPos = closestSnappingPos;
 
             //Module to snap closest snap pos
             Vector3 localPos2 = destinationPos - pose.position;
             Vector3 closestSnapPos = moduleToSnap.GetLocalSnappingPosition(localPos2, snapRotation);
+            Vector3 rotatedOffset = closestSnapPos;
             closestSnapPos += pose.position;
+
+
+            //closest snap pos is the global point nearest of the pose
+            //destination pos is the global point nearest of the destinationpose
 
             Handles.color = Color.magenta;
             Handles.DrawLine(closestSnapPos, destinationPos);
 
+            Vector3 finalPoint = destinationPos + snapOffset;
+
             return pose.position;
         }
 
-        
+
         private Vector3 SnapModuleToGrid(Vector3 position)
         {
             Vector3 gridSize = EditorSnapSettings.gridSize;
