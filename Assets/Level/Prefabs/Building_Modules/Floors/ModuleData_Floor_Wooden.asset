@@ -20,29 +20,28 @@ MonoBehaviour:
   ModuleName: Wooden
   ModuleType: 2
   Preview: {fileID: 0}
-  _snappingPoints:
-    Points:
-    - UseFilter: 1
-      LocalPoint: {x: 0, y: 0, z: 0.99999994}
-      SnappingPointFilter: 0
-    - UseFilter: 1
-      LocalPoint: {x: 1, y: 0, z: 0}
-      SnappingPointFilter: 0
-    - UseFilter: 1
-      LocalPoint: {x: 0, y: 0, z: -0.99999994}
-      SnappingPointFilter: 0
-    - UseFilter: 1
-      LocalPoint: {x: -1, y: 0, z: 0}
-      SnappingPointFilter: 0
-    - UseFilter: 1
-      LocalPoint: {x: 0, y: 0.020000491, z: 0.99999994}
-      SnappingPointFilter: 0
-    - UseFilter: 1
-      LocalPoint: {x: 1, y: 0.020000491, z: 0}
-      SnappingPointFilter: 0
-    - UseFilter: 1
-      LocalPoint: {x: 0, y: 0.020000491, z: -0.99999994}
-      SnappingPointFilter: 0
-    - UseFilter: 1
-      LocalPoint: {x: -1, y: 0.020000491, z: 0}
-      SnappingPointFilter: 0
+  SnappingPoints:
+  - UseFilter: 1
+    LocalPoint: {x: 0, y: 0, z: 0.99999994}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 1, y: 0, z: 0}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 0, y: 0, z: -0.99999994}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: -1, y: 0, z: 0}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 0, y: 0.020000491, z: 0.99999994}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 1, y: 0.020000491, z: 0}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 0, y: 0.020000491, z: -0.99999994}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: -1, y: 0.020000491, z: 0}
+    SnappingPointFilter: 0

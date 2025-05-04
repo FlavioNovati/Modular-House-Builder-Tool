@@ -280,6 +280,7 @@ namespace Tool.ModularHouseBuilder
             _serializedObject.ApplyModifiedProperties();
         }
 
+
         private void UpdateCollider()
         {
             //Get Collider Size

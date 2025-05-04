@@ -20,29 +20,28 @@ MonoBehaviour:
   ModuleName: Corner_Interior_Big
   ModuleType: 0
   Preview: {fileID: 0}
-  _snappingPoints:
-    Points:
-    - UseFilter: 0
-      LocalPoint: {x: 0, y: -0.00000047683716, z: 0.1840625}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0.16657133, y: -0.00000047683716, z: 0}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0, y: -0.00000047683716, z: -0.1840625}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: -0.16657133, y: -0.00000047683716, z: 0}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0, y: 3.0000002, z: 0.1840625}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0.16657133, y: 3.0000002, z: 0}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: 0, y: 3.0000002, z: -0.1840625}
-      SnappingPointFilter: 0
-    - UseFilter: 0
-      LocalPoint: {x: -0.16657133, y: 3.0000002, z: 0}
-      SnappingPointFilter: 0
+  SnappingPoints:
+  - UseFilter: 1
+    LocalPoint: {x: 0, y: -0.00000047683716, z: 0.1840625}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 0.16657133, y: -0.00000047683716, z: 0}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 0, y: -0.00000047683716, z: -0.1840625}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: -0.16657133, y: -0.00000047683716, z: 0}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 0, y: 3.0000002, z: 0.1840625}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 0.16657133, y: 3.0000002, z: 0}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: 0, y: 3.0000002, z: -0.1840625}
+    SnappingPointFilter: 0
+  - UseFilter: 1
+    LocalPoint: {x: -0.16657133, y: 3.0000002, z: 0}
+    SnappingPointFilter: 0

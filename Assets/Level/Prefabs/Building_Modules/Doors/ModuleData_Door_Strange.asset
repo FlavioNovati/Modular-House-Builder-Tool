@@ -20,8 +20,7 @@ MonoBehaviour:
   ModuleName: Strange
   ModuleType: 16
   Preview: {fileID: 0}
-  _snappingPoints:
-    Points:
-    - UseFilter: 1
-      LocalPoint: {x: 0, y: 0, z: 0}
-      SnappingPointFilter: 16
+  SnappingPoints:
+  - UseFilter: 1
+    LocalPoint: {x: 0, y: 0, z: 0}
+    SnappingPointFilter: 16

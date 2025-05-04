@@ -19,13 +19,7 @@ namespace Tool.ModularHouseBuilder
         public ModuleType ModuleType;
         public Texture Preview;
 
-        [SerializeField] public List<SnappingPoint> SnappingPoints
-        {
-            get => _snappingPoints.Points;
-            set => _snappingPoints.Points = value;
-        }
-
-        [SerializeField] public SnappingPointWrapper _snappingPoints;
+        [SerializeField] public List<SnappingPoint> SnappingPoints;
 
         public Vector3 GetLocalSnappingPosition(Vector3 pos, Quaternion rot) => GetClosestSnappingPoint(pos, rot, SnappingPoints);
 
@@ -80,6 +74,6 @@ namespace Tool.ModularHouseBuilder
             return closestPoint.LocalPoint;
         }
 
-        public void SetSnappingPointsData(List<SnappingPoint> snappingPoints) => _snappingPoints.Points = snappingPoints;
+        public void SetSnappingPointsData(List<SnappingPoint> snappingPoints) => SnappingPoints = snappingPoints;
     }
 }
